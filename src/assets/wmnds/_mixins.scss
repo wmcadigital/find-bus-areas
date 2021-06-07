@@ -1,0 +1,15 @@
+// get-color() notes
+//
+// This is to get one of the brand colors in the $palettes map in vars.scss
+// Use it like so... get-color(primary);
+// If you'd like to get a tint of a color, use it like so...
+// get-color(primary, 50); by default it mixes with white
+// If you add dark to the end it will mix black instead of white
+// e.g. get-color(primary, 50, dark);
+@function get-color($color, $percent: 0, $shade: $white) {
+  // If shade is null, then by default set to white else set to shade selected
+  $shade: if($shade == dark, $black, $white);
+  $color: map-get($palettes, $color);
+
+  @return mix($shade, $color, $percent);
+}
