@@ -24,9 +24,9 @@ const BusAreas = () => {
           </div>
           <div className="wmnds-col-auto">
             <Button
-              text="Map view"
+              text="Find my bus area on a map"
               btnClass="wmnds-btn--secondary"
-              iconRight="general-chevron-right"
+              iconRight="general-location-pin"
             />
           </div>
         </div>
