@@ -3,9 +3,15 @@
     "browser": true,
     "es6": true
   },
-  "extends": ["react-app", "airbnb", "plugin:prettier/recommended", "plugin:jsx-a11y/recommended"],
+  "extends": [
+    "react-app",
+    "airbnb-typescript",
+    "plugin:prettier/recommended",
+    "plugin:jsx-a11y/recommended"
+  ],
   "parserOptions": {
     "sourceType": "module",
+    "project": "./tsconfig.json",
     "ecmaFeatures": {
       "jsx": true
     },
@@ -23,7 +29,7 @@
     "react/jsx-filename-extension": [
       1,
       {
-        "extensions": [".js", ".jsx"]
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
     ],
     "react/jsx-curly-newline": 0,
@@ -34,7 +40,23 @@
         "controlComponents": ["DebounceInput"],
         "depth": 3
       }
-    ]
+    ],
+    // note you must disable the base rule as it can report incorrect errors
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "react/jsx-uses-react": 0,
+    "react/react-in-jsx-scope": 0,
+    "react/require-default-props": 0
   },
   "settings": {
     "import/resolver": {
