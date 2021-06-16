@@ -40,21 +40,12 @@ const BusAreas = () => {
             />
           </div>
         </div>
-        <div className="wmnds-grid">
-          <div className="wmnds-col-md-3-4">
-            <p>Search for bus stops to find out which bus areas you need your ticket to cover.</p>
-            <p className="wmnds-inset-text wmnds-m-b-none">
-              If you do not know where to travel to, use our <a href="#0">journey planner</a>{' '}
-              instead.
-            </p>
-            <p className="h3 wmnds-m-b-lg">Find out which bus areas specific stops are in</p>
-            <ol className="wmnds-in-text-step">
-              <li className="wmnds-in-text-step__item">
-                Search for a postcode, road name or point of interest
-              </li>
-              <li className="wmnds-in-text-step__item">Select a bus stop from the list</li>
-            </ol>
-          </div>
+        <div className="wmnds-p-b-lg">
+          <p>Search for bus stops to find out which bus areas you need your ticket to cover.</p>
+          <p className="wmnds-inset-text wmnds-m-b-none">
+            If you do not know where to travel to, use our{' '}
+            <a href="https://journeyplanner.tfwm.org.uk/">journey planner</a> instead.
+          </p>
         </div>
       </div>
       {mapView ? <MapView /> : <ListView />}

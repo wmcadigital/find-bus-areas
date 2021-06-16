@@ -6,23 +6,6 @@
 @import '~assets/wmnds/vars';
 @import '~assets/wmnds/mixins';
 
-$duration: 0.75s;
-
-.textBg {
-  animation: fade $duration ease-out forwards;
-
-  & + path {
-    fill: $white;
-    stroke: $white;
-    stroke-width: 0.25;
-  }
-
-  // Change the airport icon to white if it is a child of selected station
-  & ~ [id='Airport'] {
-    fill: $white;
-  }
-}
-
 .mapView {
   position: relative;
 }
@@ -33,7 +16,6 @@ $duration: 0.75s;
   @media (min-width: $breakpoint-md) {
     position: sticky;
     top: 0;
-    margin: $size-md;
   }
 
   // CSS hack to make the map container square
@@ -55,34 +37,4 @@ $duration: 0.75s;
   height: 100%;
   overflow: hidden;
   background-color: get-color(background);
-}
-
-.zoneSelected {
-  path:first-child {
-    fill: get-color(secondary, 70);
-  }
-}
-
-.hideStations {
-  & > g:not(.showStation):not(.selectedStation) {
-    display: none;
-  }
-}
-
-@keyframes fade {
-  0% {
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  75% {
-    opacity: 0.5;
-  }
-
-  100% {
-    opacity: 1;
-  }
 }
