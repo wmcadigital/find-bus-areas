@@ -6,7 +6,7 @@ export const initialState = (() => {
   const state: TForm.State = {
     mounted: false,
     ticketSearch: !!getSearchParam('ticketSearch'),
-    mapView: !!getSearchParam('mapView'),
+    mapView: getSearchParam('mapView') === 'true',
   };
 
   return state;
