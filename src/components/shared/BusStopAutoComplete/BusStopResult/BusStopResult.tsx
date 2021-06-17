@@ -11,7 +11,7 @@ function BusStopResult() {
         Brierley Hill Rd is in the <strong>Sandwell and Dudley</strong>,{' '}
         <strong>Black Country</strong> and <strong>West Midlands bus area.</strong>
       </p>
-      <div className="wmnds-p-md wmnds-m-b-lg bg-planned-disruption">
+      <div className="wmnds-p-md wmnds-m-b-lg wmnds-msg-help">
         To travel between these bus stops, you’ll need a <strong>Sandwell and Dudley</strong>{' '}
         ticket.
       </div>

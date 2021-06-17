@@ -1,7 +1,9 @@
 import Button from 'components/shared/Button/Button';
 import BusStopAutoComplete from 'components/shared/BusStopAutoComplete/BusStopAutoComplete';
+import { useFormContext } from 'globalState';
 
 const BusStopSearch = () => {
+  const [formState] = useFormContext();
   return (
     <div>
       <div className="wmnds-text-align-right">
@@ -12,7 +14,9 @@ const BusStopSearch = () => {
         <li className="wmnds-in-text-step__item">
           Search for a postcode, road name or point of interest
         </li>
-        <li className="wmnds-in-text-step__item">Select a bus stop from the list</li>
+        <li className="wmnds-in-text-step__item">
+          Select a bus stop from the {formState.mapView ? 'map' : 'list'}
+        </li>
       </ol>
       <BusStopAutoComplete />
     </div>
