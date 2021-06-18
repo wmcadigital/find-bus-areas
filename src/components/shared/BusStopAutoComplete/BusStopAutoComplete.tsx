@@ -7,7 +7,6 @@ import Button from 'components/shared/Button/Button';
 import Message from 'components/shared/Message/Message';
 // Import styles
 import s from './BusStopAutoComplete.module.scss';
-import BusStopResult from './BusStopResult/BusStopResult';
 // Import custom hooks
 import useBusStopAPI from './customHooks/useBusStopAPI';
 
@@ -37,7 +36,27 @@ const BusStopAutoComplete = () => {
             name="BusStopFrom"
             placeholder="Search"
             onUpdate={onUpdate}
-            value={query}
+            initialValue={query}
+            onSelectResult={onSelect}
+            results={results}
+            loading={loading}
+            errorMessage={
+              <Message
+                type="error"
+                title={errorInfo?.title}
+                message={errorInfo?.message}
+                showRetry={errorInfo?.isTimeoutError}
+                retryCallback={getAPIResults}
+              />
+            }
+          />
+        </div>
+        <div className="wmnds-m-b-md">
+          <AutoComplete
+            label="To:"
+            name="BusStopTo"
+            placeholder="Search"
+            onUpdate={onUpdate}
             onSelectResult={onSelect}
             results={results}
             loading={loading}
@@ -72,7 +91,7 @@ const BusStopAutoComplete = () => {
             </div>
           )}
         </div>
-        <BusStopResult />
+        <div className="wmnds-msg-help">Select your bus stop from the map</div>
       </div>
     </>
   );

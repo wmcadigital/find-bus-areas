@@ -1,0 +1,18 @@
+// Import WMN Design System scss for use in this scss file
+// Tilde (~) represents the root folder(src)
+@import '~assets/wmnds/vars';
+@import '~assets/wmnds/mixins';
+
+.closeButton {
+  padding: $size-sm;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.closeIcon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  fill: get-color(secondary);
+}

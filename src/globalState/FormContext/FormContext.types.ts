@@ -1,12 +1,13 @@
 export type State = {
-  mounted: boolean;
   mapView: boolean;
   ticketSearch: boolean;
+  selectedStops: any[];
 };
 
 export type StateAction =
   | {
-      type: 'MOUNT_APP';
+      type: 'ADD_SELECTED_STOP';
+      payload: any[];
     }
   | {
       type: 'CHANGE_VIEW';

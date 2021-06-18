@@ -1,0 +1,26 @@
+// Import WMN Design System scss for use in this scss file
+// Tilde (~) represents the root folder(src)
+@import '~assets/wmnds/vars';
+@import '~assets/wmnds/mixins';
+
+.selectedItemBox {
+  width: 100%;
+  height: 50px;
+  padding-right: 0;
+  padding-left: $size-sm;
+  border: 1px solid get-color(primary);
+  background-color: $white;
+  align-content: center;
+}
+
+.selectedSummary {
+  display: block;
+  width: 100%;
+  align-self: center;
+
+  @media all and (min-width: 360px) {
+    max-width: calc(100% - (115px));
+    margin-top: 0;
+    margin-right: $size-md;
+  }
+}
