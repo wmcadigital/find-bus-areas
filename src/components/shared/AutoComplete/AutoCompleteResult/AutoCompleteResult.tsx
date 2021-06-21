@@ -27,7 +27,7 @@ const AutoCompleteResult = ({
       onKeyDown={(e) => handleKeyDown(e)}
       onClick={handleClick}
     >
-      <div>
+      <div style={{ display: 'none' }}>
         <DisruptionIndicatorMedium className="wmnds-col-auto" text={result.serviceNumber} />
       </div>
       {/* Right section */}

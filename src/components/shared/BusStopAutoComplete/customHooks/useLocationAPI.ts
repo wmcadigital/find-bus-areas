@@ -7,7 +7,7 @@ interface IError {
   isTimeoutError?: boolean;
 }
 
-const useLocationAPI = () => {
+const useLocationAPI = (apiPath: string) => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); // Set loading state for spinner
   const [errorInfo, setErrorInfo] = useState<IError | null>(null); // Placeholder to set error messaging
@@ -30,7 +30,15 @@ const useLocationAPI = () => {
   const clearApiTimeout = () => clearTimeout(apiTimeout.current);
 
   const handleApiResponse = useCallback((response) => {
-    console.log(response.data);
+    console.log(response.data.candidates);
+    if (response.data.candidates?.length > 0)
+      setResults(
+        response.data.candidates.map((addr: any, i: number) => ({
+          id: `${addr.address.replace(/\W/g, '_')}_${i}`, // makeshift id from address
+          name: addr.address,
+          ...addr,
+        }))
+      );
     clearApiTimeout();
     setLoading(false);
   }, []);
@@ -51,36 +59,34 @@ const useLocationAPI = () => {
   };
 
   // Take main function out of useEffect, so it can be called elsewhere to retry the search
-  const getAPIResults = useCallback(
-    ({ x: longitude, y: latitude }) => {
-      source.current = axios.CancelToken.source();
-      mounted.current = true; // Set mounted to true (used later to make sure we don't do events as component is unmounting)
-      const { REACT_APP_API_HOST, REACT_APP_API_KEY } = process.env; // Destructure env vars
-      setLoading(true); // Update loading state to true as we are hitting API
-      startApiTimeout();
-      const options = {
-        headers: {
-          'Ocp-Apim-Subscription-Key': REACT_APP_API_KEY,
-        },
-        cancelToken: source.current.token, // Set token with API call, so we can cancel this call on unmount
-      };
+  const getAPIResults = useCallback(() => {
+    source.current = axios.CancelToken.source();
+    mounted.current = true; // Set mounted to true (used later to make sure we don't do events as component is unmounting)
+    const { REACT_APP_API_HOST, REACT_APP_LOCATION_KEY } = process.env; // Destructure env vars
+    setLoading(true); // Update loading state to true as we are hitting API
+    startApiTimeout();
+    const options = {
+      headers: {
+        'Ocp-Apim-Subscription-Key': REACT_APP_LOCATION_KEY,
+      },
+      cancelToken: source.current.token, // Set token with API call, so we can cancel this call on unmount
+    };
 
-      axios
-        .get(`${REACT_APP_API_HOST}/Stop/v1/Nearest/${latitude}/${longitude}/`, options)
-        .then((res) => mounted.current && handleApiResponse(res))
-        .catch(handleApiError);
-    },
-    [handleApiResponse, startApiTimeout]
-  );
+    axios
+      .get(REACT_APP_API_HOST + apiPath, options)
+      .then((res) => mounted.current && handleApiResponse(res))
+      .catch(handleApiError);
+  }, [apiPath, handleApiResponse, startApiTimeout]);
 
   useEffect(() => {
+    getAPIResults();
     // Unmount / cleanup
     return () => {
       mounted.current = false; // Set mounted back to false on unmount
       cancelRequest(); // cancel the request
       clearApiTimeout(); // clear timeout
     };
-  }, []);
+  }, [getAPIResults]);
 
   return { loading, errorInfo, results, getAPIResults };
 };
