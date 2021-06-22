@@ -4,12 +4,17 @@ import CloseButton from './CloseButton/CloseButton';
 import s from './SelectedItem.module.scss';
 import { useAutoCompleteContext } from '../AutoCompleteState/AutoCompleteContext';
 
-const SelectedItem = ({ onClearSelection }: { onClearSelection?: any }) => {
+type SelectedItemProps = {
+  selectedItem: { name: string; indicatorText?: string; [key: string]: any };
+  onClearSelection?: any;
+};
+
+const SelectedItem = ({ selectedItem, onClearSelection }: SelectedItemProps) => {
   const selectedItemRef = useRef(null);
-  const [{ selectedItem }, autoCompleteDispatch] = useAutoCompleteContext();
+  const [, autoCompleteDispatch] = useAutoCompleteContext();
 
   const handleClear = () => {
-    autoCompleteDispatch({ type: 'REMOVE_SELECTED_ITEM' });
+    autoCompleteDispatch({ type: 'UPDATE_QUERY', payload: '' });
     if (onClearSelection) onClearSelection();
   };
 

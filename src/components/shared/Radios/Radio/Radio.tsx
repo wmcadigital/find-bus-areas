@@ -9,7 +9,7 @@ export type RadioProps = {
   name: string;
   text: string;
   value: string;
-  info: string;
+  info?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 

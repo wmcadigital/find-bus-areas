@@ -7,7 +7,7 @@ interface IError {
   isTimeoutError?: boolean;
 }
 
-const useLocationAPI = () => {
+const useBusStopAPI = () => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); // Set loading state for spinner
   const [errorInfo, setErrorInfo] = useState<IError | null>(null); // Placeholder to set error messaging
@@ -30,7 +30,10 @@ const useLocationAPI = () => {
   const clearApiTimeout = () => clearTimeout(apiTimeout.current);
 
   const handleApiResponse = useCallback((response) => {
-    console.log(response.data);
+    if (response.data.features?.length > 0)
+      setResults(
+        response.data.features.filter((result: any) => result.properties.type === 'bus-stop')
+      );
     clearApiTimeout();
     setLoading(false);
   }, []);
@@ -66,7 +69,7 @@ const useLocationAPI = () => {
       };
 
       axios
-        .get(`${REACT_APP_API_HOST}/Stop/v1/Nearest/${latitude}/${longitude}/`, options)
+        .get(`${REACT_APP_API_HOST}/Stop/v2/Nearest/${latitude}/${longitude}/500`, options)
         .then((res) => mounted.current && handleApiResponse(res))
         .catch(handleApiError);
     },
@@ -85,4 +88,4 @@ const useLocationAPI = () => {
   return { loading, errorInfo, results, getAPIResults };
 };
 
-export default useLocationAPI;
+export default useBusStopAPI;

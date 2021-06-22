@@ -17,9 +17,10 @@ type AutoCompleteProps = {
   type?: 'text' | 'number';
   onUpdate: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectResult: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onClear?: () => void;
   results?: any[] | null;
-  initialValue?: string;
-  initialItem?: any;
+  initialQuery?: string;
+  selectedItem?: any;
   errorMessage?: any;
   loading?: boolean;
 };
@@ -34,25 +35,25 @@ const AutoComplete = ({
   results,
   onUpdate,
   onSelectResult,
-  initialValue,
-  initialItem,
+  onClear,
+  initialQuery,
+  selectedItem,
   loading,
   errorMessage,
 }: AutoCompleteProps) => {
   const resultsList = useRef(null);
   const inputRef = useRef(null);
-  const [{ mounted, selectedItem, query }, autoCompleteDispatch] = useAutoCompleteContext();
+  const [{ mounted, query }, autoCompleteDispatch] = useAutoCompleteContext();
   // Import handleKeyDown function from customHook (used by all modes)
   const { handleKeyDown } = useHandleAutoCompleteKeys(resultsList, inputRef, results);
 
   useEffect(() => {
     if (!mounted) {
       autoCompleteDispatch({ type: 'MOUNT_COMPONENT', payload: true });
-      if (initialValue) autoCompleteDispatch({ type: 'UPDATE_QUERY', payload: initialValue });
-      if (initialItem) autoCompleteDispatch({ type: 'UPDATE_SELECTED_ITEM', payload: initialItem });
+      if (initialQuery) autoCompleteDispatch({ type: 'UPDATE_QUERY', payload: initialQuery });
     }
     return autoCompleteDispatch({ type: 'MOUNT_COMPONENT', payload: false });
-  }, [mounted, initialItem, initialValue, autoCompleteDispatch]);
+  }, [mounted, initialQuery, autoCompleteDispatch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     autoCompleteDispatch({
@@ -69,7 +70,7 @@ const AutoComplete = ({
         </label>
       )}
       {selectedItem ? (
-        <SelectedItem />
+        <SelectedItem selectedItem={selectedItem} onClearSelection={onClear} />
       ) : (
         <>
           <div className={`wmnds-autocomplete wmnds-grid ${loading ? 'wmnds-is--loading' : ''}`}>
@@ -126,11 +127,12 @@ const ContextWrapper = ({
   type,
   onUpdate,
   onSelectResult,
+  onClear,
   results,
   errorMessage,
   loading,
-  initialValue,
-  initialItem,
+  initialQuery,
+  selectedItem,
 }: AutoCompleteProps) => {
   return (
     <AutoCompleteProvider>
@@ -143,11 +145,12 @@ const ContextWrapper = ({
         type={type}
         onUpdate={onUpdate}
         onSelectResult={onSelectResult}
+        onClear={onClear}
         results={results}
-        initialValue={initialValue}
+        initialQuery={initialQuery}
         errorMessage={errorMessage}
         loading={loading}
-        initialItem={initialItem}
+        selectedItem={selectedItem}
       />
     </AutoCompleteProvider>
   );

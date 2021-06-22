@@ -6,8 +6,12 @@ export type State = {
 
 export type StateAction =
   | {
-      type: 'ADD_SELECTED_STOP';
+      type: 'UPDATE_SELECTED_STOPS';
       payload: any[];
+    }
+  | {
+      type: 'ADD_STOP';
+      payload: string;
     }
   | {
       type: 'CHANGE_VIEW';

@@ -30,7 +30,6 @@ const useLocationAPI = (apiPath: string) => {
   const clearApiTimeout = () => clearTimeout(apiTimeout.current);
 
   const handleApiResponse = useCallback((response) => {
-    console.log(response.data.candidates);
     if (response.data.candidates?.length > 0)
       setResults(
         response.data.candidates.map((addr: any, i: number) => ({

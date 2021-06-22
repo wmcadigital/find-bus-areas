@@ -5,9 +5,12 @@ import BusStopResult from '../BusStopAutoComplete/BusStopResult/BusStopResult';
 import s from './BusStopSearch.module.scss';
 
 const BusStopSearch = () => {
-  const [{ mapView, selectedStops }] = useFormContext();
+  const [{ mapView, selectedStops }, formDispatch] = useFormContext();
+  const additionalStops = selectedStops.filter(
+    (stop) => stop.autoCompleteId !== 'selectedStopFrom' && stop.autoCompleteId !== 'selectedStopTo'
+  );
   const addBusStop = () => {
-    console.log('add bus stop');
+    formDispatch({ type: 'ADD_STOP', payload: `additionalStop${additionalStops.length}` });
   };
   return (
     <div>
@@ -24,29 +27,45 @@ const BusStopSearch = () => {
           Select a bus stop from the {mapView ? 'map' : 'list'}
         </li>
       </ol>
-      <BusStopAutoComplete />
-      <div className={`wmnds-grid wmnds-m-b-lg ${mapView ? '' : 'wmnds-grid--spacing-2-md'}`}>
-        <div className={mapView ? 'wmnds-col-1' : 'wmnds-col-1-2'}>
-          <Button
-            btnClass={`wmnds-btn--primary wmnds-col-1 ${s.addBtn}`}
-            iconRight="general-expand"
-            text="Add another stop"
-            onClick={addBusStop}
-            // disabled={selectedBusStops.length >= 12}
-          />
-        </div>
-        {!mapView && (
-          <div className="wmnds-col-1-2">
+      <BusStopAutoComplete id="selectedStopFrom" label="From:" name="BusStopFrom" />
+      {selectedStops.length > 0 && (
+        <BusStopAutoComplete id="selectedStopTo" label="To:" name="BusStopTo" />
+      )}
+      {additionalStops.map((stop, i) => (
+        <BusStopAutoComplete
+          key={stop.autoCompleteId}
+          id={`additionalStop${i}`}
+          name={`additionalStop${i}`}
+        />
+      ))}
+      {selectedStops.length >= 2 && (
+        <div className={`wmnds-grid wmnds-m-b-lg ${mapView ? '' : 'wmnds-grid--spacing-2-md'}`}>
+          <div className={mapView ? 'wmnds-col-1' : 'wmnds-col-1-2'}>
             <Button
-              btnClass="wmnds-col-1"
-              iconRight="general-chevron-right"
-              text="Search for bus area"
+              btnClass={`wmnds-btn--primary wmnds-col-1 ${s.addBtn}`}
+              iconRight="general-expand"
+              text="Add another stop"
+              onClick={addBusStop}
+              disabled={selectedStops.length >= 12}
             />
           </div>
-        )}
-      </div>
-      <div className="wmnds-msg-help">Select your bus stop from the map</div>
-      {selectedStops.length > 1 && <BusStopResult />}
+          {!mapView && (
+            <div className="wmnds-col-1-2">
+              <Button
+                btnClass="wmnds-col-1"
+                iconRight="general-chevron-right"
+                text="Search for bus area"
+              />
+            </div>
+          )}
+        </div>
+      )}
+      {mapView && (
+        <div>
+          <div className="wmnds-msg-help">Select your bus stop from the map</div>
+          {selectedStops.length > 1 && <BusStopResult />}
+        </div>
+      )}
     </div>
   );
 };

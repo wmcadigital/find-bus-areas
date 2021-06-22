@@ -1,15 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
+// Import context
+import { useFormContext } from 'globalState';
 // Import components
 import AutoComplete from 'components/shared/AutoComplete/AutoComplete';
 import Message from 'components/shared/Message/Message';
+import Loader from 'components/shared/Loader/Loader';
+import Radio from 'components/shared/Radios/Radio/Radio';
 // Import custom hooks
 import useLocationAPI from './customHooks/useLocationAPI';
 import useBusStopAPI from './customHooks/useBusStopAPI';
+import useBusStopSelect from './customHooks/useBusStopSelect';
 
-const BusStopAutoComplete = () => {
+const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; name: string }) => {
+  const [{ mapView, selectedStops }, formDispatch] = useFormContext();
   const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState<any>();
+  const [location, setLocation] = useState<any>();
+  const { onBusStopSelect } = useBusStopSelect();
+  const selectedItem = selectedStops.find((stop) => stop.autoCompleteId === id);
+
   // eslint-disable-next-line prettier/prettier
   const {
     results: locationResults,
@@ -21,44 +30,91 @@ const BusStopAutoComplete = () => {
       query.toLowerCase()
     )}&f=pjson`
   );
-  const { loading: locationLoading, getAPIResults: getStopAPIResults } = useBusStopAPI();
+  const {
+    results: stopResults,
+    loading: locationLoading,
+    getAPIResults: getStopAPIResults,
+  } = useBusStopAPI();
 
   useEffect(() => {
-    if (selected?.location) {
+    if (location?.location) {
       // Make api call to get nearest stops to location
-      console.log(selected.location);
-      getStopAPIResults(selected.location);
+      getStopAPIResults(location.location);
     }
-  }, [selected, getStopAPIResults]);
+  }, [location, getStopAPIResults]);
+
+  useEffect(() => {
+    // When stop results are added, add nearest bus stops to map
+    if (mapView && stopResults.length > 0) {
+      console.log(stopResults);
+    }
+  }, [mapView, stopResults]);
 
   const onUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   };
   const onSelect = (result: any) => {
-    setSelected(result);
+    setLocation(result);
+  };
+  const onClear = () => {
+    setLocation(null);
+    const payload = selectedStops.filter((stop) => stop.autoCompleteId !== id);
+    formDispatch({ type: 'UPDATE_SELECTED_STOPS', payload });
+  };
+  const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onBusStopSelect(
+      id,
+      location,
+      stopResults.find((res) => res.properties.atcoCode === e.target.value)
+    );
   };
   return (
-    <div className="wmnds-m-b-md">
-      <AutoComplete
-        label="From:"
-        name="BusStopFrom"
-        placeholder="Search"
-        onUpdate={onUpdate}
-        initialValue={query}
-        onSelectResult={onSelect}
-        results={locationResults}
-        loading={loading}
-        errorMessage={
-          <Message
-            type="error"
-            title={errorInfo?.title}
-            message={errorInfo?.message}
-            showRetry={errorInfo?.isTimeoutError}
-            retryCallback={getAPIResults}
-          />
-        }
-      />
-    </div>
+    <>
+      <div className="wmnds-m-b-md">
+        <AutoComplete
+          label={label}
+          name={name}
+          placeholder="Search"
+          onUpdate={onUpdate}
+          onClear={onClear}
+          initialQuery={query}
+          selectedItem={selectedItem?.selectedLocation || location}
+          onSelectResult={onSelect}
+          results={locationResults}
+          loading={loading}
+          errorMessage={
+            <Message
+              type="error"
+              title={errorInfo?.title}
+              message={errorInfo?.message}
+              showRetry={errorInfo?.isTimeoutError}
+              retryCallback={getAPIResults}
+            />
+          }
+        />
+      </div>
+      {!mapView && location && (
+        <>
+          {locationLoading ? (
+            <div className="wmnds-p-md">
+              <Loader />
+            </div>
+          ) : (
+            <div className="wmnds-m-b-md">
+              {stopResults.map((res) => (
+                <Radio
+                  key={res.properties.atcoCode}
+                  name={id}
+                  text={res.properties.name}
+                  value={res.properties.atcoCode}
+                  onChange={onRadioChange}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </>
   );
 };
 

@@ -17,8 +17,13 @@ export const reducer = (state = initialState, action: TForm.StateAction): TForm.
     case 'CHANGE_VIEW':
       setSearchParam('mapView', `${action.payload}`);
       return { ...state, mapView: action.payload };
-    case 'ADD_SELECTED_STOP':
-      return { ...state, selectedStops: [...state.selectedStops, action.payload] };
+    case 'UPDATE_SELECTED_STOPS':
+      return { ...state, selectedStops: action.payload };
+    case 'ADD_STOP':
+      return {
+        ...state,
+        selectedStops: [...state.selectedStops, { autoCompleteId: action.payload }],
+      };
 
     // Default should return initial state if error
     default:
