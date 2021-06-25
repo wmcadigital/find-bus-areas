@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 // Imported components
 import CloseButton from './CloseButton/CloseButton';
 import s from './SelectedItem.module.scss';
@@ -17,6 +17,11 @@ const SelectedItem = ({ selectedItem, onClearSelection }: SelectedItemProps) => 
     autoCompleteDispatch({ type: 'UPDATE_QUERY', payload: '' });
     if (onClearSelection) onClearSelection();
   };
+
+  // Clear query on unmount
+  useEffect(() => {
+    return autoCompleteDispatch({ type: 'UPDATE_QUERY', payload: '' });
+  }, [autoCompleteDispatch]);
 
   return (
     <>

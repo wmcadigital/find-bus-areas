@@ -45,7 +45,7 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
   }, [location, getStopAPIResults]);
 
   useEffect(() => {
-    // When stop results are added, add nearest bus stop results to map context
+    // When stop results are added, add nearest bus stops to map
     if (mapView && stopResults.length > 0) {
       mapDispatch({ type: 'UPDATE_STOP_RESULTS', payload: stopResults });
     }

@@ -1,6 +1,7 @@
 import Button from 'components/shared/Button/Button';
 import BusStopAutoComplete from 'components/shared/BusStopAutoComplete/BusStopAutoComplete';
 import { useFormContext } from 'globalState';
+import ClearSearch from 'components/shared/ClearSearch/ClearSearch';
 import BusStopResult from '../BusStopAutoComplete/BusStopResult/BusStopResult';
 import s from './BusStopSearch.module.scss';
 
@@ -12,11 +13,10 @@ const BusStopSearch = () => {
   const addBusStop = () => {
     formDispatch({ type: 'ADD_STOP', payload: `additionalStop${additionalStops.length}` });
   };
+
   return (
-    <div>
-      <div className="wmnds-text-align-right">
-        <Button btnClass="wmnds-btn--link wmnds-m-l-md" text="Clear search" />
-      </div>
+    <div className="wmnds-p-b-lg">
+      {mapView && <ClearSearch />}
       <p className="h3">All companies (nBus and nNetwork)</p>
       <p className="h4 wmnds-m-b-lg">Find out which bus areas specific stops are in</p>
       <ol className="wmnds-in-text-step">
@@ -27,6 +27,7 @@ const BusStopSearch = () => {
           Select a bus stop from the {mapView ? 'map' : 'list'}
         </li>
       </ol>
+      {!mapView && <ClearSearch />}
       <BusStopAutoComplete id="selectedStopFrom" label="From:" name="BusStopFrom" />
       {selectedStops.length > 0 && (
         <BusStopAutoComplete id="selectedStopTo" label="To:" name="BusStopTo" />

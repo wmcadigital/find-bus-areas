@@ -14,7 +14,6 @@ export const reducer = (state = initialState, action: TMap.MapStateAction): TMap
   switch (action.type) {
     case 'UPDATE_STOP_RESULTS':
       return { ...state, stopResults: action.payload };
-
     // Default should return initial state if error
     default:
       return initialState;
