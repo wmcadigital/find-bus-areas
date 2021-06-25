@@ -60,12 +60,7 @@ const BusStopSearch = () => {
           )}
         </div>
       )}
-      {mapView && (
-        <div>
-          <div className="wmnds-msg-help">Select your bus stop from the map</div>
-          {selectedStops.length > 1 && <BusStopResult />}
-        </div>
-      )}
+      {mapView && <div>{selectedStops.length > 1 && <BusStopResult />}</div>}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
 // Import context
-import { useFormContext } from 'globalState';
+import { useFormContext, useMapContext } from 'globalState';
 // Import components
 import AutoComplete from 'components/shared/AutoComplete/AutoComplete';
 import Message from 'components/shared/Message/Message';
@@ -14,6 +14,7 @@ import useBusStopSelect from './customHooks/useBusStopSelect';
 
 const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; name: string }) => {
   const [{ mapView, selectedStops }, formDispatch] = useFormContext();
+  const [, mapDispatch] = useMapContext();
   const [query, setQuery] = useState('');
   const [location, setLocation] = useState<any>();
   const { onBusStopSelect } = useBusStopSelect();
@@ -44,11 +45,11 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
   }, [location, getStopAPIResults]);
 
   useEffect(() => {
-    // When stop results are added, add nearest bus stops to map
+    // When stop results are added, add nearest bus stop results to map context
     if (mapView && stopResults.length > 0) {
-      console.log(stopResults);
+      mapDispatch({ type: 'UPDATE_STOP_RESULTS', payload: stopResults });
     }
-  }, [mapView, stopResults]);
+  }, [mapView, mapDispatch, stopResults]);
 
   const onUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
@@ -113,6 +114,9 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
             </div>
           )}
         </>
+      )}
+      {mapView && location && (
+        <div className="wmnds-msg-help">Select your bus stop from the map</div>
       )}
     </>
   );

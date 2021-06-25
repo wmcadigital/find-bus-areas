@@ -5,8 +5,8 @@ import { loadModules, setDefaultOptions } from 'esri-loader';
 // eslint-disable-next-line import/no-unresolved
 import locateCircle from 'assets/svgs/map/locate-circle.svg';
 
-const useCreateMapView = (mapContainerRef) => {
-  const [viewState, setViewState] = useState(null);
+const useCreateMapView = (mapContainerRef: any) => {
+  const [viewState, setViewState] = useState<any>();
   const [isCreated, setIsCreated] = useState(false);
 
   const createMapView = useCallback(async () => {
@@ -47,7 +47,7 @@ const useCreateMapView = (mapContainerRef) => {
         id: 'geolocation',
         view,
         popupEnabled: false,
-        goToOverride: (e, { target }) => view.goTo(target.target),
+        goToOverride: (e: any, { target }: { target: any }) => view.goTo(target.target),
         graphic: new Graphic({
           // overwrites the default symbol used for the graphic placed at the location of the user when found
           symbol: {
@@ -88,7 +88,7 @@ const useCreateMapView = (mapContainerRef) => {
 
     return () => {
       if (!viewState) return;
-      viewState.destroy();
+      viewState!.destroy();
     };
   }, [createMapView, isCreated, viewState]);
 

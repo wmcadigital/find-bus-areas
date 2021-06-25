@@ -9,5 +9,5 @@
 // Much easier! :)
 
 // Don't forget to add the providers for each context to the ./ContextProvider.js file(more info inside there)
-
-export * from './FormContext';
+export { useFormContext, FormProvider } from './FormContext';
+export { useMapContext, MapProvider } from './MapContext';

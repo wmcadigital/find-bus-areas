@@ -1,6 +1,7 @@
 import React from 'react';
 // Import your provider here
 import { FormProvider } from './FormContext';
+import { MapProvider } from './MapContext';
 // Also add your provider with a self-closing tag to the contexts array on line 20
 // By doing this, it allows the contexts to provided throughout the whole app without having to wrap components in lots of providers. We just have on central provider around the whole app called contextProvider which nests all the other providers in.
 
@@ -16,7 +17,9 @@ function ProviderComposer({ contexts, children }) {
 
 const ContextProvider = (props) => {
   const { children } = props || {};
-  return <ProviderComposer contexts={[<FormProvider />]}>{children}</ProviderComposer>;
+  return (
+    <ProviderComposer contexts={[<FormProvider />, <MapProvider />]}>{children}</ProviderComposer>
+  );
 };
 
 export default ContextProvider;
