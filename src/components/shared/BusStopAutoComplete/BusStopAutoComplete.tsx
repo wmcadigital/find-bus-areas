@@ -47,9 +47,12 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
   useEffect(() => {
     // When stop results are added, add nearest bus stops to map
     if (mapView && stopResults.length > 0) {
-      mapDispatch({ type: 'UPDATE_STOP_RESULTS', payload: stopResults });
+      mapDispatch({
+        type: 'UPDATE_STOP_RESULTS',
+        payload: { autoCompleteId: id, location, stopResults },
+      });
     }
-  }, [mapView, mapDispatch, stopResults]);
+  }, [mapView, mapDispatch, id, location, stopResults]);
 
   const onUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
