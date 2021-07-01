@@ -2,6 +2,7 @@ import Button from 'components/shared/Button/Button';
 import BusStopAutoComplete from 'components/shared/BusStopAutoComplete/BusStopAutoComplete';
 import { useFormContext } from 'globalState';
 import ClearSearch from 'components/shared/ClearSearch/ClearSearch';
+import BusAreaKey from 'components/shared/BusAreaKey/BusAreaKey';
 import BusStopResult from '../BusStopAutoComplete/BusStopResult/BusStopResult';
 import s from './BusStopSearch.module.scss';
 
@@ -61,7 +62,12 @@ const BusStopSearch = () => {
           )}
         </div>
       )}
-      {mapView && <div>{selectedStops.length > 1 && <BusStopResult />}</div>}
+      {mapView && (
+        <div>
+          {selectedStops.length > 1 && <BusStopResult />}
+          <BusAreaKey />
+        </div>
+      )}
     </div>
   );
 };
