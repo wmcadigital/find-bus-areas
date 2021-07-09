@@ -6,7 +6,7 @@ import Icon from '../Icon/Icon';
 type InputProps = {
   name: string;
   children?: React.ReactNode;
-  handleChange?: () => void;
+  handleChange?: (o: any) => void;
   checked: boolean;
   classes?: string;
 };

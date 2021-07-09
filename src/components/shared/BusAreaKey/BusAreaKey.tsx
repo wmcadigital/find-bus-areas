@@ -1,15 +1,27 @@
 import { useState } from 'react';
+import { useMapContext } from 'globalState';
 import Button from '../Button/Button';
 import Checkbox from '../Checkbox/Checkbox';
 import s from './BusAreaKey.module.scss';
 
 const BusAreaKey = () => {
   const [showKey, setShowKey] = useState(true);
-  const areas = [
-    { name: 'West Midlands', color: '#c96c08' },
-    { name: 'Black Country', color: '#000000' },
-    { name: 'Sandwell and Dudley', color: '#741372' },
-  ];
+  const [{ busAreas, view }, mapDispatch] = useMapContext();
+  const areas = Object.keys(busAreas).map((key) => busAreas[key]);
+  const handleToggle = (area: any) => {
+    if (view) {
+      const payload = {
+        name: area.properties.area_name,
+        value: !busAreas[area.properties.area_name].visible,
+      };
+      mapDispatch({
+        type: 'TOGGLE_AREA',
+        payload,
+      });
+      view.map.findLayerById(area.id).visible = payload.value;
+    }
+  };
+
   return (
     <div className={s.mapKeyContainer}>
       <div className={s.keyHeader}>
@@ -20,13 +32,19 @@ const BusAreaKey = () => {
           onClick={() => setShowKey(!showKey)}
         />
       </div>
-      {showKey &&
+      {view &&
+        showKey &&
         areas.map((area) => (
-          <div key={area.name} className={`${s.keyIcon}`}>
-            <Checkbox checked={false} classes="wmnds-m-none" name="area_toggle">
-              {area.name}
+          <div key={area.id} className={`${s.keyIcon}`}>
+            <Checkbox
+              handleChange={() => handleToggle(area)}
+              checked={area.visible}
+              classes="wmnds-m-none"
+              name="area_toggle"
+            >
+              {area.properties.area_name}
             </Checkbox>
-            <div className={s.keyBorder} style={{ borderColor: area.color }} />
+            <div className={s.keyBorder} style={{ borderColor: `rgb(${area.color})` }} />
           </div>
         ))}
     </div>

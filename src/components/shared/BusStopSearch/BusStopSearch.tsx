@@ -16,7 +16,7 @@ const BusStopSearch = () => {
   };
 
   return (
-    <div className="wmnds-p-b-lg">
+    <div className={`${s.traySearchContainer} wmnds-p-b-lg`}>
       {mapView && <ClearSearch />}
       <p className="h3">All companies (nBus and nNetwork)</p>
       <p className="h4 wmnds-m-b-lg">Find out which bus areas specific stops are in</p>
