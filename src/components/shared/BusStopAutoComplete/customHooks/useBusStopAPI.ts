@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { getBusAreas } from 'components/App/NZoneAreas/NZoneAreas';
 import axios from 'axios';
 
 interface IError {
@@ -30,10 +31,25 @@ const useBusStopAPI = () => {
   const clearApiTimeout = () => clearTimeout(apiTimeout.current);
 
   const handleApiResponse = useCallback((response) => {
-    if (response.data.features?.length > 0)
-      setResults(
-        response.data.features.filter((result: any) => result.properties.type === 'bus-stop')
-      );
+    console.log(response);
+    if (response.data.stopPoints?.length > 0) {
+      const stopResults = response.data.stopPoints.map((stop: any) => {
+        const stopBusAreas = getBusAreas([stop.longitude, stop.latitude]);
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [stop.longitude, stop.latitude],
+          },
+          properties: {
+            ...stop,
+          },
+          stopBusAreas,
+        };
+      });
+
+      setResults(stopResults);
+    }
     clearApiTimeout();
     setLoading(false);
   }, []);
@@ -69,7 +85,7 @@ const useBusStopAPI = () => {
       };
 
       axios
-        .get(`${REACT_APP_API_HOST}/Stop/v2/Nearest/${latitude}/${longitude}/500`, options)
+        .get(`${REACT_APP_API_HOST}/Stop/v1/Nearest/${latitude}/${longitude}/`, options)
         .then((res) => mounted.current && handleApiResponse(res))
         .catch(handleApiError);
     },

@@ -3,8 +3,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 // Import context
 import { useFormContext, useMapContext } from 'globalState';
 // eslint-disable-next-line import/no-unresolved
+
 import { loadModules } from 'esri-loader';
+import locationMarker from 'assets/svgs/map/locate-circle.svg';
 import mapMarker from 'assets/svgs/map/map-marker.svg';
+
 // Import components
 import AutoComplete from 'components/shared/AutoComplete/AutoComplete';
 import Message from 'components/shared/Message/Message';
@@ -14,7 +17,6 @@ import Radio from 'components/shared/Radios/Radio/Radio';
 import useLocationAPI from './customHooks/useLocationAPI';
 import useBusStopAPI from './customHooks/useBusStopAPI';
 import useBusStopSelect from './customHooks/useBusStopSelect';
-import BusStopResult from './BusStopResult/BusStopResult';
 
 const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; name: string }) => {
   const [{ mapView, selectedStops }, formDispatch] = useFormContext();
@@ -23,7 +25,6 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
   const [location, setLocation] = useState<any>();
   const { onBusStopSelect } = useBusStopSelect();
   const selectedItem = selectedStops.find((stop) => stop.autoCompleteId === id);
-
   // eslint-disable-next-line prettier/prettier
   const {
     results: locationResults,
@@ -51,18 +52,20 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
       if (view) {
         const features: any = [];
         const nameValues: any = [];
-        const resultsToShow = stopResults.map((res) => {
+        const resultsToShow = stopResults.map((res: any) => {
           const newResult = res;
           newResult.properties.name = res.properties.name.replace(/ *\([^)]*\) */g, '');
           return newResult;
         });
-        resultsToShow.forEach((result) => {
+        resultsToShow?.forEach((result: any) => {
           if (!nameValues.includes(result.properties.name)) {
             nameValues.push(result.properties.name);
+            console.log(result);
             const geometry = {
               attributes: {
                 name: result.properties.name,
                 atcoCode: result.properties.atcoCode,
+                busArea: result.stopBusAreas[0],
                 // whatever else you'll need - then reference in the 'fields' property below
               },
               geometry: {
@@ -78,7 +81,28 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
           }
         });
 
-        console.log(features);
+        const locationGraphic = {
+          geometry: {
+            type: 'point',
+            longitude: location.location.x,
+            latitude: location.location.y,
+            spatialreference: {
+              wkid: 4326,
+            },
+          },
+          symbol: {
+            type: 'picture-marker',
+            url: locationMarker,
+            width: 150,
+            height: 150,
+          },
+        };
+
+        const locationLayer = new GraphicsLayer({
+          graphics: [locationGraphic],
+        });
+
+        view.map.add(locationLayer);
 
         const stopLayer = new FeatureLayer({
           source: features, // autocast as a Collection of new Graphic()
@@ -99,6 +123,11 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
               alias: 'atcoCode',
               type: 'string',
             },
+            {
+              name: 'busArea',
+              alias: 'busArea',
+              type: 'string',
+            },
           ],
           renderer: {
             type: 'simple',
@@ -112,7 +141,7 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
         });
 
         const popup = {
-          title: '{NAME}',
+          title: '{NAME}, {BUSAREA}',
         };
 
         stopLayer.popupTemplate = popup;
@@ -135,9 +164,9 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
     // When stop results are added, add nearest bus stops to map
     const areas = Object.keys(busAreas).map((key) => busAreas[key]);
     if (mapView && stopResults.length > 0) {
-      areas.forEach((area) => {
-        view.map.findLayerById(area.id).visible = false;
-      });
+      // areas.forEach((area) => {
+      //   view.map.findLayerById(area.id).visible = false;
+      // });
 
       mapDispatch({
         type: 'UPDATE_STOP_RESULTS',

@@ -1,3 +1,5 @@
+import pointInPolygon from 'point-in-polygon';
+
 export const NZoneColours: { [key: string]: number[] } = {
   'West Midlands': [201, 108, 8],
   'Black Country': [0, 0, 0],
@@ -1215,3 +1217,22 @@ export const NZoneAreas = {
     },
   ],
 };
+
+export const getBusAreas = (coordinates: [number, number]) => {
+  const busAreaPolygons = NZoneAreas.features.map((area) => ({
+    name: area.properties.area_name,
+    polygon: area.geometry.coordinates[0],
+  }));
+
+  const stopBusAreas: string[] = [];
+  busAreaPolygons.forEach((poly: any) => {
+    const isWithinArea = pointInPolygon(coordinates, poly.polygon);
+    if (isWithinArea) {
+      stopBusAreas.push(poly.name);
+    }
+  });
+
+  return stopBusAreas || null;
+};
+
+console.log(getBusAreas([-1.85714, 52.514229]));

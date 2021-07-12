@@ -30,6 +30,7 @@
     "esri-loader": "^3.1.0",
     "fecha": "^4.2.1",
     "node-sass": "^5.0.0",
+    "point-in-polygon": "^1.1.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-app-polyfill": "^2.0.0",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@types/dompurify": "^2.2.1",
+    "@types/point-in-polygon": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",
