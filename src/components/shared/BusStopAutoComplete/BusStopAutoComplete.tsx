@@ -10,9 +10,10 @@ import mapMarker from 'assets/svgs/map/map-marker.svg';
 
 // Import components
 import AutoComplete from 'components/shared/AutoComplete/AutoComplete';
+import Button from 'components/shared/Button/Button';
+import Icon from 'components/shared/Icon/Icon';
 import Message from 'components/shared/Message/Message';
 import Loader from 'components/shared/Loader/Loader';
-import Radio from 'components/shared/Radios/Radio/Radio';
 // Import custom hooks
 import useLocationAPI from './customHooks/useLocationAPI';
 import useBusStopAPI from './customHooks/useBusStopAPI';
@@ -38,8 +39,9 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
   );
   const {
     results: stopResults,
-    loading: locationLoading,
+    loading: stopsLoading,
     getAPIResults: getStopAPIResults,
+    errorInfo: stopErrorInfo,
   } = useBusStopAPI();
 
   const addStopsToMap = useCallback(async () => {
@@ -60,13 +62,11 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
         resultsToShow?.forEach((result: any) => {
           if (!nameValues.includes(result.properties.name)) {
             nameValues.push(result.properties.name);
-            console.log(result);
             const geometry = {
               attributes: {
                 name: result.properties.name,
                 atcoCode: result.properties.atcoCode,
                 busArea: result.stopBusAreas[0],
-                // whatever else you'll need - then reference in the 'fields' property below
               },
               geometry: {
                 type: 'point',
@@ -151,7 +151,7 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
       // eslint-disable-next-line no-console
       console.log(error);
     }
-  }, [view, stopResults]);
+  }, [view, location, stopResults]);
 
   useEffect(() => {
     if (location?.location) {
@@ -187,13 +187,13 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
     const payload = selectedStops.filter((stop) => stop.autoCompleteId !== id);
     formDispatch({ type: 'UPDATE_SELECTED_STOPS', payload });
   };
-  const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onBusStopSelect(
-      id,
-      location,
-      stopResults.find((res) => res.properties.atcoCode === e.target.value)
-    );
+  const handleStopSelect = (result: any) => {
+    onBusStopSelect(id, location, result);
   };
+  const getMiles = (i: number) => {
+    return (i * 0.000621371192).toFixed(1);
+  };
+
   return (
     <>
       <div className="wmnds-m-b-md">
@@ -204,7 +204,7 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
           onUpdate={onUpdate}
           onClear={onClear}
           initialQuery={query}
-          selectedItem={selectedItem?.selectedLocation || location}
+          selectedItem={selectedItem?.properties || location}
           onSelectResult={onSelect}
           results={locationResults}
           loading={loading}
@@ -221,22 +221,40 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
       </div>
       {!mapView && location && (
         <>
-          {locationLoading ? (
+          {stopsLoading ? (
             <div className="wmnds-p-md">
               <Loader />
             </div>
           ) : (
-            <div className="wmnds-m-b-md">
-              {stopResults.map((res) => (
-                <Radio
-                  key={res.properties.atcoCode}
-                  name={id}
-                  text={res.properties.name}
-                  value={res.properties.atcoCode}
-                  onChange={onRadioChange}
-                />
-              ))}
-            </div>
+            <>
+              {!selectedItem && (
+                <div className="wmnds-m-b-md">
+                  {stopResults.length > 0 ? (
+                    <>
+                      <p className="wmnds-m-b-md">Select your stop from the list</p>
+                      {stopResults.map((res) => (
+                        <Button
+                          key={res.properties.atcoCode}
+                          text={`${res.properties.name}, (${
+                            getMiles(res.properties.distance) < '0.1'
+                              ? '> 0.1'
+                              : getMiles(res.properties.distance)
+                          } miles away)`}
+                          btnClass="wmnds-btn--link wmnds-btn--align-left wmnds-m-b-sm"
+                          onClick={() => handleStopSelect(res)}
+                        />
+                      ))}
+                    </>
+                  ) : (
+                    <Message
+                      type="error"
+                      title={stopErrorInfo?.title}
+                      message={stopErrorInfo?.message}
+                    />
+                  )}
+                </div>
+              )}
+            </>
           )}
         </>
       )}

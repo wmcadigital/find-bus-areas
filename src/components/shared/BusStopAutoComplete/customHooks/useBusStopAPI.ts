@@ -33,22 +33,33 @@ const useBusStopAPI = () => {
   const handleApiResponse = useCallback((response) => {
     console.log(response);
     if (response.data.stopPoints?.length > 0) {
-      const stopResults = response.data.stopPoints.map((stop: any) => {
-        const stopBusAreas = getBusAreas([stop.longitude, stop.latitude]);
-        return {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [stop.longitude, stop.latitude],
-          },
-          properties: {
-            ...stop,
-          },
-          stopBusAreas,
-        };
-      });
+      const stopResults = response.data.stopPoints
+        .map((stop: any) => {
+          const stopBusAreas = getBusAreas([stop.longitude, stop.latitude]);
+          return {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [stop.longitude, stop.latitude],
+            },
+            properties: {
+              ...stop,
+            },
+            stopBusAreas,
+          };
+        })
+        .filter((stop: any) => stop.stopBusAreas.length > 0);
 
-      setResults(stopResults);
+      if (stopResults.length > 0) {
+        setResults(stopResults);
+      } else {
+        setResults([]);
+        setErrorInfo({
+          // Update error message
+          title: 'Please try another location',
+          message: 'No west midlands bus stops were found near to your selected location',
+        });
+      }
     }
     clearApiTimeout();
     setLoading(false);

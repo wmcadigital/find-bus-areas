@@ -6,7 +6,7 @@ import BusAreaKey from 'components/shared/BusAreaKey/BusAreaKey';
 import BusStopResult from '../BusStopAutoComplete/BusStopResult/BusStopResult';
 import s from './BusStopSearch.module.scss';
 
-const BusStopSearch = () => {
+const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
   const [{ mapView, selectedStops }, formDispatch] = useFormContext();
   const additionalStops = selectedStops.filter(
     (stop) => stop.autoCompleteId !== 'selectedStopFrom' && stop.autoCompleteId !== 'selectedStopTo'
@@ -57,6 +57,7 @@ const BusStopSearch = () => {
                 btnClass="wmnds-col-1"
                 iconRight="general-chevron-right"
                 text="Search for bus area"
+                onClick={onComplete}
               />
             </div>
           )}

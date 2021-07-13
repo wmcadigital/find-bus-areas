@@ -11,13 +11,7 @@ type MessageProps = {
   retryCallback?: () => void;
 };
 
-const Message = ({
-  type = 'success',
-  title = 'Good service',
-  message = 'No incidents reported.',
-  showRetry = false,
-  retryCallback,
-}: MessageProps) => {
+const Message = ({ type, title, message, showRetry = false, retryCallback }: MessageProps) => {
   let iconName;
   switch (type) {
     case 'error':
@@ -39,7 +33,7 @@ const Message = ({
       </div>
 
       <div className="wmnds-msg-summary__info">
-        <p className="wmnds-m-b-sm">{sanitize(message)}</p>
+        <p className="wmnds-m-b-sm">{message && sanitize(message)}</p>
         {showRetry && (
           <button type="button" className="wmnds-btn wmnds-btn--link" onClick={retryCallback}>
             Retry search

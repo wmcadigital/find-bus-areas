@@ -7,6 +7,7 @@ export const initialState = (() => {
     ticketSearch: !!getSearchParam('ticketSearch'),
     mapView: getSearchParam('mapView') === 'true',
     selectedStops: [],
+    showResult: false,
   };
 
   return state;
@@ -19,6 +20,8 @@ export const reducer = (state = initialState, action: TForm.StateAction): TForm.
       return { ...state, mapView: action.payload };
     case 'UPDATE_SELECTED_STOPS':
       return { ...state, selectedStops: action.payload };
+    case 'SHOW_RESULT':
+      return { ...state, showResult: action.payload };
     case 'ADD_STOP':
       return {
         ...state,

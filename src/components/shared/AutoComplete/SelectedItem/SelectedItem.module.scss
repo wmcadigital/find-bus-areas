@@ -5,8 +5,10 @@
 
 .selectedItemBox {
   width: 100%;
-  height: 50px;
+  min-height: 50px;
+  padding-top: $size-xs;
   padding-right: 0;
+  padding-bottom: $size-xs;
   padding-left: $size-sm;
   border: 1px solid get-color(primary);
   background-color: $white;

@@ -40,13 +40,6 @@ const BusAreas = () => {
             />
           </div>
         </div>
-        <div className="wmnds-p-b-lg">
-          <p>Search for bus stops to find out which bus areas you need your ticket to cover.</p>
-          <p className="wmnds-inset-text wmnds-m-b-none">
-            If you do not know where to travel to, use our{' '}
-            <a href="https://journeyplanner.tfwm.org.uk/">journey planner</a> instead.
-          </p>
-        </div>
       </div>
       {mapView ? <MapView /> : <ListView />}
     </>

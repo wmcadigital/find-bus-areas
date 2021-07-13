@@ -2,6 +2,7 @@ export type State = {
   mapView: boolean;
   ticketSearch: boolean;
   selectedStops: any[];
+  showResult: boolean;
 };
 
 export type StateAction =
@@ -12,6 +13,10 @@ export type StateAction =
   | {
       type: 'ADD_STOP';
       payload: string;
+    }
+  | {
+      type: 'SHOW_RESULT';
+      payload: boolean;
     }
   | {
       type: 'CHANGE_VIEW';
