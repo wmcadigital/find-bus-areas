@@ -1234,5 +1234,3 @@ export const getBusAreas = (coordinates: [number, number]) => {
 
   return stopBusAreas || null;
 };
-
-console.log(getBusAreas([-1.85714, 52.514229]));

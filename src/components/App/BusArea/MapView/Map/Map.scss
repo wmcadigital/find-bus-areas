@@ -1,28 +1,13 @@
 // sass-lint:disable class-name-format
 // sass-lint:disable no-color-literals
 // sass-lint:disable quotes
-@import '~assets/styles/vars';
-@import '~assets/styles/mixins';
+@import '~assets/wmnds/vars';
+@import '~assets/wmnds/mixins';
 
 $offset-top: $size-lg;
 $duration: 0.35s;
 
 .busAreas-esri-map {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transition: height $duration ease;
-  background-color: #eeeeee;
-
-  @media all and(min-width: 768px) {
-    position: static;
-    width: calc(100% - 414px); // 414px is the width of the tray
-    float: right;
-  }
-
   // Styling for ui in the top right
   .esri-ui-top-right {
     flex-flow: column-reverse;
@@ -84,5 +69,69 @@ $duration: 0.35s;
         background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m223.13 1.766-208.7 96.324c-24.079 11.238-16.053 46.555 9.632 46.555h88.3v88.298c0 25.684 35.317 33.716 46.556 9.632l96.325-208.7c8.026-19.27-12.845-40.14-32.11-32.109z' fill='%233c1053'/%3E%3C/svg%3E%0A");
       }
     }
+  }
+}
+
+.esri-ui .esri-popup {
+  &__main-container {
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__header {
+    padding-right: $size-xsm;
+    order: 1;
+  }
+
+  &__header-buttons {
+    padding: 0;
+  }
+
+  &__footer {
+    flex: 0 0 calc(100% - 52px);
+  }
+
+  &__inline-actions-container {
+    margin-right: 0;
+
+    .esri-popup__button {
+      display: inline-flex;
+      border-radius: 0;
+      color: get-color(cta);
+      font-family: $x-font-family;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: underline;
+      align-items: center;
+
+      .esri-popup__action-text {
+        margin-left: $size-xsm;
+      }
+
+      .esri-popup__action-image {
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+      }
+
+      &:hover {
+        color: get-color(cta, 30, dark);
+        background: none;
+      }
+
+      &[aria-label='Zoom to'] {
+        display: none;
+      }
+    }
+  }
+
+  .esri-icon-close {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    color: get-color(primary);
+    font-size: 30px;
+    flex: 0 0 30px;
   }
 }

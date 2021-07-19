@@ -4,28 +4,26 @@ import { useRef, useEffect, useCallback } from 'react';
 import { loadModules } from 'esri-loader';
 import { useMapContext } from 'globalState';
 import s from './Map.module.scss';
+import './Map.scss';
 // Import custom hooks for map functionality
 import useCreateMapView from './customHooks/useCreateMapView';
+import useCreateStopsLayer from './customHooks/useCreateStopsLayer';
 
 const Map = () => {
   // MAP SETUP
   const mapContainerRef = useRef<any>();
   const [, mapDispatch] = useMapContext();
   const view = useCreateMapView(mapContainerRef);
-  const test = useCallback(async () => {
-    try {
-      if (view) {
-        mapDispatch({ type: 'ADD_VIEW', payload: view });
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error);
-    }
-  }, [view, mapDispatch]);
+  const isStopsLayerCreated = useCreateStopsLayer(view);
 
   useEffect(() => {
-    test();
-  }, [test]);
+    if (view) {
+      mapDispatch({ type: 'ADD_VIEW', payload: view });
+    }
+    return () => {
+      mapDispatch({ type: 'ADD_VIEW', payload: null });
+    };
+  }, [view, mapDispatch]);
 
   return (
     <div className={`${s.mapView}`}>

@@ -31,7 +31,6 @@ const useBusStopAPI = () => {
   const clearApiTimeout = () => clearTimeout(apiTimeout.current);
 
   const handleApiResponse = useCallback((response) => {
-    console.log(response);
     if (response.data.stopPoints?.length > 0) {
       const stopResults = response.data.stopPoints
         .map((stop: any) => {

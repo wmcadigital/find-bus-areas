@@ -5,8 +5,9 @@ import * as TMap from './MapContext.types';
 export const initialState = (() => {
   const state: TMap.MapState = {
     view: null,
-    stopResults: [],
+    stopResults: {},
     busAreas: {},
+    isStopsLayerCreated: false,
   };
 
   return state;
@@ -18,6 +19,8 @@ export const reducer = (state = initialState, action: TMap.MapStateAction): TMap
       return { ...state, view: action.payload };
     case 'UPDATE_STOP_RESULTS':
       return { ...state, stopResults: action.payload };
+    case 'MOUNT_STOPS_LAYER':
+      return { ...state, isStopsLayerCreated: action.payload };
     case 'ADD_AREAS':
       return { ...state, busAreas: action.payload };
     case 'TOGGLE_AREA':

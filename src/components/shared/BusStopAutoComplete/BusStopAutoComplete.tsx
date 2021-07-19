@@ -3,29 +3,26 @@ import React, { useState, useEffect, useCallback } from 'react';
 // Import context
 import { useFormContext, useMapContext } from 'globalState';
 // eslint-disable-next-line import/no-unresolved
-
-import { loadModules } from 'esri-loader';
-import locationMarker from 'assets/svgs/map/locate-circle.svg';
-import mapMarker from 'assets/svgs/map/map-marker.svg';
-
 // Import components
 import AutoComplete from 'components/shared/AutoComplete/AutoComplete';
 import Button from 'components/shared/Button/Button';
-import Icon from 'components/shared/Icon/Icon';
 import Message from 'components/shared/Message/Message';
 import Loader from 'components/shared/Loader/Loader';
 // Import custom hooks
 import useLocationAPI from './customHooks/useLocationAPI';
 import useBusStopAPI from './customHooks/useBusStopAPI';
+import useAddStopsToMap from './customHooks/useAddStopsToMap';
 import useBusStopSelect from './customHooks/useBusStopSelect';
 
 const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; name: string }) => {
   const [{ mapView, selectedStops }, formDispatch] = useFormContext();
-  const [{ view, busAreas }, mapDispatch] = useMapContext();
+  const [{ view, busAreas, isStopsLayerCreated }, mapDispatch] = useMapContext();
   const [query, setQuery] = useState('');
+  const [mustUpdate, setMustUpdate] = useState(true);
   const [location, setLocation] = useState<any>();
   const { onBusStopSelect } = useBusStopSelect();
-  const selectedItem = selectedStops.find((stop) => stop.autoCompleteId === id);
+  const selectedItem = selectedStops.find((stop) => stop.autoCompleteId === id) || null;
+  const { updateMapStops, selectedResult } = useAddStopsToMap();
   // eslint-disable-next-line prettier/prettier
   const {
     results: locationResults,
@@ -44,114 +41,16 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
     errorInfo: stopErrorInfo,
   } = useBusStopAPI();
 
-  const addStopsToMap = useCallback(async () => {
-    try {
-      const [Graphic, GraphicsLayer, FeatureLayer] = await loadModules([
-        'esri/Graphic',
-        'esri/layers/GraphicsLayer',
-        'esri/layers/FeatureLayer',
-      ]);
-      if (view) {
-        const features: any = [];
-        const nameValues: any = [];
-        const resultsToShow = stopResults.map((res: any) => {
-          const newResult = res;
-          newResult.properties.name = res.properties.name.replace(/ *\([^)]*\) */g, '');
-          return newResult;
-        });
-        resultsToShow?.forEach((result: any) => {
-          if (!nameValues.includes(result.properties.name)) {
-            nameValues.push(result.properties.name);
-            const geometry = {
-              attributes: {
-                name: result.properties.name,
-                atcoCode: result.properties.atcoCode,
-                busArea: result.stopBusAreas[0],
-              },
-              geometry: {
-                type: 'point',
-                longitude: result.geometry.coordinates[0],
-                latitude: result.geometry.coordinates[1],
-                spatialreference: {
-                  wkid: 4326,
-                },
-              },
-            };
-            features.push(geometry);
-          }
-        });
+  const handleStopSelect = (result: any) => {
+    onBusStopSelect(id, location, result);
+  };
 
-        const locationGraphic = {
-          geometry: {
-            type: 'point',
-            longitude: location.location.x,
-            latitude: location.location.y,
-            spatialreference: {
-              wkid: 4326,
-            },
-          },
-          symbol: {
-            type: 'picture-marker',
-            url: locationMarker,
-            width: 150,
-            height: 150,
-          },
-        };
-
-        const locationLayer = new GraphicsLayer({
-          graphics: [locationGraphic],
-        });
-
-        view.map.add(locationLayer);
-
-        const stopLayer = new FeatureLayer({
-          source: features, // autocast as a Collection of new Graphic()
-          objectIdField: 'oid',
-          fields: [
-            {
-              name: 'oid',
-              alias: 'ObjectID',
-              type: 'oid',
-            },
-            {
-              name: 'name',
-              alias: 'name',
-              type: 'string',
-            },
-            {
-              name: 'atcoCode',
-              alias: 'atcoCode',
-              type: 'string',
-            },
-            {
-              name: 'busArea',
-              alias: 'busArea',
-              type: 'string',
-            },
-          ],
-          renderer: {
-            type: 'simple',
-            symbol: {
-              type: 'picture-marker',
-              url: mapMarker,
-              width: 24,
-              height: 24,
-            },
-          },
-        });
-
-        const popup = {
-          title: '{NAME}, {BUSAREA}',
-        };
-
-        stopLayer.popupTemplate = popup;
-        view.map.add(stopLayer);
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error);
+  useEffect(() => {
+    if (mapView && selectedResult && mustUpdate) {
+      onBusStopSelect(id, location, selectedResult);
+      setMustUpdate(false);
     }
-  }, [view, location, stopResults]);
+  }, [id, location, mapView, onBusStopSelect, selectedResult, mustUpdate]);
 
   useEffect(() => {
     if (location?.location) {
@@ -162,7 +61,7 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
 
   useEffect(() => {
     // When stop results are added, add nearest bus stops to map
-    const areas = Object.keys(busAreas).map((key) => busAreas[key]);
+    // const areas = Object.keys(busAreas).map((key) => busAreas[key]);
     if (mapView && stopResults.length > 0) {
       // areas.forEach((area) => {
       //   view.map.findLayerById(area.id).visible = false;
@@ -172,9 +71,21 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
         type: 'UPDATE_STOP_RESULTS',
         payload: { autoCompleteId: id, location, nearestStops: stopResults },
       });
-      addStopsToMap();
+      if (isStopsLayerCreated) {
+        updateMapStops(stopResults);
+      }
     }
-  }, [mapView, mapDispatch, id, location, stopResults, view, busAreas, addStopsToMap]);
+  }, [
+    mapView,
+    mapDispatch,
+    id,
+    location,
+    stopResults,
+    // view,
+    // busAreas,
+    updateMapStops,
+    isStopsLayerCreated,
+  ]);
 
   const onUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
@@ -186,9 +97,6 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
     setLocation(null);
     const payload = selectedStops.filter((stop) => stop.autoCompleteId !== id);
     formDispatch({ type: 'UPDATE_SELECTED_STOPS', payload });
-  };
-  const handleStopSelect = (result: any) => {
-    onBusStopSelect(id, location, result);
   };
   const getMiles = (i: number) => {
     return (i * 0.000621371192).toFixed(1);
@@ -227,14 +135,14 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
             </div>
           ) : (
             <>
-              {!selectedItem && (
+              {!selectedItem?.properties && (
                 <div className="wmnds-m-b-md">
                   {stopResults.length > 0 ? (
                     <>
                       <p className="wmnds-m-b-md">Select your stop from the list</p>
                       {stopResults.map((res) => (
                         <Button
-                          key={res.properties.atcoCode}
+                          key={`${id}-${res.properties.atcoCode}`}
                           text={`${res.properties.name}, (${
                             getMiles(res.properties.distance) < '0.1'
                               ? '> 0.1'
@@ -258,8 +166,10 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
           )}
         </>
       )}
-      {mapView && location && (
-        <div className="wmnds-msg-help">Select your bus stop from the map</div>
+      {mapView && location && !selectedItem?.properties && (
+        <div className="wmnds-msg-help">
+          Select your bus stop from the map and confirm your bus stop in the pop-up box
+        </div>
       )}
     </>
   );

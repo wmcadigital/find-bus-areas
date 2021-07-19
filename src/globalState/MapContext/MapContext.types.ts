@@ -8,6 +8,7 @@ export type MapState = {
   view: any;
   stopResults: any;
   busAreas: BusArea;
+  isStopsLayerCreated: boolean;
 };
 
 export type MapStateAction =
@@ -26,6 +27,10 @@ export type MapStateAction =
   | {
       type: 'ADD_AREAS';
       payload: BusArea;
+    }
+  | {
+      type: 'MOUNT_STOPS_LAYER';
+      payload: boolean;
     };
 
 export type MapContext = [MapState, React.Dispatch<MapStateAction>];

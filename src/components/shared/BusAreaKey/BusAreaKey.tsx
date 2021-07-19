@@ -5,7 +5,7 @@ import Checkbox from '../Checkbox/Checkbox';
 import s from './BusAreaKey.module.scss';
 
 const BusAreaKey = () => {
-  const [showKey, setShowKey] = useState(true);
+  const [showKey, setShowKey] = useState(false);
   const [{ busAreas, view }, mapDispatch] = useMapContext();
   const areas = Object.keys(busAreas).map((key) => busAreas[key]);
   const handleToggle = (area: any) => {
