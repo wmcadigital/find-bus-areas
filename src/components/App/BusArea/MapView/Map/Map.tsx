@@ -12,7 +12,7 @@ import useCreateStopsLayer from './customHooks/useCreateStopsLayer';
 const Map = () => {
   // MAP SETUP
   const mapContainerRef = useRef<any>();
-  const [, mapDispatch] = useMapContext();
+  const [mapState, mapDispatch] = useMapContext();
   const view = useCreateMapView(mapContainerRef);
   const isStopsLayerCreated = useCreateStopsLayer(view);
 
@@ -24,6 +24,15 @@ const Map = () => {
       mapDispatch({ type: 'ADD_VIEW', payload: null });
     };
   }, [view, mapDispatch]);
+
+  useEffect(() => {
+    const busAreasArray = Object.keys(mapState.busAreas).map((key) => mapState.busAreas[key]);
+    if (mapState.view?.map) {
+      busAreasArray.forEach((area) => {
+        mapState.view.map.findLayerById(area.id).visible = area.visible;
+      });
+    }
+  }, [mapState.view, mapState.busAreas]);
 
   return (
     <div className={`${s.mapView}`}>

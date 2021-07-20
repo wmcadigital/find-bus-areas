@@ -1,26 +1,12 @@
 import { useState } from 'react';
-import { useMapContext } from 'globalState';
+import useToggleBusAreas from 'globalState/customHooks/useToggleBusAreas';
 import Button from '../Button/Button';
 import Checkbox from '../Checkbox/Checkbox';
 import s from './BusAreaKey.module.scss';
 
 const BusAreaKey = () => {
   const [showKey, setShowKey] = useState(false);
-  const [{ busAreas, view }, mapDispatch] = useMapContext();
-  const areas = Object.keys(busAreas).map((key) => busAreas[key]);
-  const handleToggle = (area: any) => {
-    if (view) {
-      const payload = {
-        name: area.properties.area_name,
-        value: !busAreas[area.properties.area_name].visible,
-      };
-      mapDispatch({
-        type: 'TOGGLE_AREA',
-        payload,
-      });
-      view.map.findLayerById(area.id).visible = payload.value;
-    }
-  };
+  const { view, busAreasArray, toggleBusArea } = useToggleBusAreas();
 
   return (
     <div className={s.mapKeyContainer}>
@@ -34,10 +20,10 @@ const BusAreaKey = () => {
       </div>
       {view &&
         showKey &&
-        areas.map((area) => (
+        busAreasArray.map((area: any) => (
           <div key={area.id} className={`${s.keyIcon}`}>
             <Checkbox
-              handleChange={() => handleToggle(area)}
+              handleChange={() => toggleBusArea(area, !area.visible)}
               checked={area.visible}
               classes="wmnds-m-none"
               name="area_toggle"

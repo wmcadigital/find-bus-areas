@@ -1,6 +1,4 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React from 'react';
-
 import Icon from '../Icon/Icon';
 
 type InputProps = {
@@ -12,14 +10,12 @@ type InputProps = {
 };
 
 const InputCheckbox = ({ name, children, handleChange, checked, classes }: InputProps) => {
-  // Set input to render below
-
   return (
     <div className={`wmnds-fe-group ${classes}`}>
       <label className="wmnds-fe-checkboxes__container wmnds-m-none">
         {children}
         <input
-          defaultChecked={checked}
+          checked={checked}
           className="wmnds-fe-checkboxes__input"
           onChange={handleChange}
           name={name}

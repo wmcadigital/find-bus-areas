@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useFormContext, useMapContext } from 'globalState';
+import useToggleBusAreas from 'globalState/customHooks/useToggleBusAreas';
 import Button from 'components/shared/Button/Button';
 import Icon from 'components/shared/Icon/Icon';
 import useClearSearch from 'components/shared/ClearSearch/useClearSearch';
@@ -9,36 +10,37 @@ import useRecommendedBusArea from './useRecommendedBusArea';
 
 function BusStopResult() {
   const [{ selectedStops, ticketSearch }] = useFormContext();
-  const [{ view, busAreas }] = useMapContext();
+  const [{ view }] = useMapContext();
+  const { toggleBusArea, busAreasArray } = useToggleBusAreas();
   const { clearSearch } = useClearSearch();
   const recommendedAreas = useRecommendedBusArea();
-  const [selectedArea, setSelectedArea] = useState(recommendedAreas?.text);
+  const [selectedArea, setSelectedArea] = useState(null);
+  const [valid, setValid] = useState(false);
+  const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
-    const areas = Object.keys(busAreas).map((key) => busAreas[key]);
-    if (view && recommendedAreas) {
-      areas.forEach((area) => {
-        if (recommendedAreas.options.includes(area.properties.area_name)) {
-          view.map.findLayerById(area.id).visible = true;
+    if (!selectedArea) {
+      setSelectedArea(recommendedAreas?.text);
+    }
+    if (!completed) {
+      if (valid) {
+        setValid(true);
+      }
+      setCompleted(true);
+      busAreasArray.forEach((area) => {
+        if (selectedArea === area.properties.area_name) {
+          toggleBusArea(area, true);
         } else {
-          view.map.findLayerById(area.id).visible = false;
+          toggleBusArea(area, false);
         }
       });
     }
-  }, [view, busAreas, recommendedAreas]);
+  }, [view, completed, valid, selectedArea, recommendedAreas, busAreasArray, toggleBusArea]);
 
   const handleRadioChange = (e: any) => {
-    const areas = Object.keys(busAreas).map((key) => busAreas[key]);
-    if (view && selectedArea) {
-      areas.forEach((area) => {
-        if (area.properties.area_name === selectedArea) {
-          view.map.findLayerById(area.id).visible = true;
-        } else {
-          view.map.findLayerById(area.id).visible = false;
-        }
-      });
-    }
     setSelectedArea(e.target.value);
+    setValid(true);
+    setCompleted(false);
   };
 
   return (
@@ -78,20 +80,20 @@ function BusStopResult() {
                   </fieldset>
                 </div>
               )}
-              <div className="wmnds-m-b-md">
-                <a
-                  href={`https://find-a-ticket.tfwm.org.uk/?busArea=${encodeURI(
-                    recommendedAreas.options.length > 1 ? selectedArea : recommendedAreas.text
-                  )}`}
-                  className="wmnds-btn"
-                >
-                  Continue with your ticket{' '}
-                  <Icon
-                    className="wmnds-btn__icon wmnds-btn__icon--right"
-                    iconName="general-chevron-right"
-                  />
-                </a>
-              </div>
+              {valid && (
+                <div className="wmnds-m-b-md">
+                  <a
+                    href={`https://find-a-ticket.tfwm.org.uk/?busArea=${encodeURI(selectedArea!)}`}
+                    className="wmnds-btn"
+                  >
+                    Continue with your ticket{' '}
+                    <Icon
+                      className="wmnds-btn__icon wmnds-btn__icon--right"
+                      iconName="general-chevron-right"
+                    />
+                  </a>
+                </div>
+              )}
             </>
           )}
           <Button
