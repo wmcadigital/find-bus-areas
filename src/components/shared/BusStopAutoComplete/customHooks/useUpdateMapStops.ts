@@ -55,13 +55,18 @@ const useUpdateMapStops = () => {
                   res.addFeatureResults.forEach((item: any) => {
                     objectIds.push(item.objectId);
                   });
+                  const stopsQuery = busStopsLayer.createQuery();
+                  stopsQuery.returnGeometry = true;
                   // query the newly added features from the layer
                   busStopsLayer
-                    .queryFeatures({
+                    .queryFeatures(stopsQuery, {
                       objectIds,
                     })
                     .then((results: any) => {
                       console.log(results.features.length, 'features have been added.');
+                      if (results.features.length) {
+                        view.goTo(results.features);
+                      }
                     });
                 }
               })

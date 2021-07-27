@@ -55,7 +55,9 @@ const useCreateMapView = (mapContainerRef: any) => {
         container: mapContainerRef.current,
         map: new Map({ basemap }),
         center: [-2.0047209, 52.4778132],
-        zoom: 10,
+        constraints: {
+          snapToZoom: true,
+        },
       });
 
       // Create a locate button
@@ -101,49 +103,14 @@ const useCreateMapView = (mapContainerRef: any) => {
         const gLayer = new GraphicsLayer({
           id: area.id,
           graphics: [graphic],
-          objectIdField: 'oid', // This must be defined when creating a layer from `Graphic` objects
+          objectIdField: 'oid',
           visible: area.visible,
         });
         view.map.add(gLayer);
       });
 
-      // const locationFeatureLayer = new FeatureLayer({
-      //   id: 'stopsLayer',
-      //   source: [],
-      //   objectIdField: 'oid',
-      //   fields: [
-      //     {
-      //       name: 'oid',
-      //       alias: 'ObjectID',
-      //       type: 'oid',
-      //     },
-      //     {
-      //       name: 'name',
-      //       alias: 'name',
-      //       type: 'string',
-      //     },
-      //     {
-      //       name: 'atcoCode',
-      //       alias: 'atcoCode',
-      //       type: 'string',
-      //     },
-      //     {
-      //       name: 'busArea',
-      //       alias: 'busArea',
-      //       type: 'string',
-      //     },
-      //   ],
-      //   renderer: {
-      //     type: 'simple',
-      //     symbol: {
-      //       type: 'simple-marker',
-      //       outline: { style: 'none', color: [0, 0, 0, 0] },
-      //       color: [255, 20, 20, 1],
-      //     },
-      //   },
-      // });
-      // view.map.add(locationFeatureLayer);
-      // view.map.reorder(locationFeatureLayer, 2);
+      const wmArea = busAreas.current.map((area: any) => area.geometry.coordinates);
+      view.goTo(wmArea).then(() => console.log(wmArea));
 
       setViewState(view);
       setIsCreated(true);

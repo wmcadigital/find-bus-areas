@@ -11,7 +11,7 @@ import Loader from 'components/shared/Loader/Loader';
 // Import custom hooks
 import useLocationAPI from './customHooks/useLocationAPI';
 import useBusStopAPI from './customHooks/useBusStopAPI';
-import useAddStopsToMap from './customHooks/useAddStopsToMap';
+import useAddStopsToMap from './customHooks/useUpdateMapStops';
 import useBusStopSelect from './customHooks/useBusStopSelect';
 
 const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; name: string }) => {

@@ -31,6 +31,10 @@ const Map = () => {
       busAreasArray.forEach((area) => {
         mapState.view.map.findLayerById(area.id).visible = area.visible;
       });
+      const visibleBusAreas = busAreasArray
+        .filter((area: any) => area.visible)
+        .map((area: any) => area.geometry.coordinates);
+      if (visibleBusAreas.length > 0) mapState.view.goTo(visibleBusAreas);
     }
   }, [mapState.view, mapState.busAreas]);
 

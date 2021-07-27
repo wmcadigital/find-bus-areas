@@ -15,7 +15,6 @@ const useToggleBusAreas = () => {
           type: 'TOGGLE_AREA',
           payload,
         });
-        // view.map.findLayerById(area.id).visible = payload.value;
       }
     },
     [mapDispatch, view]
