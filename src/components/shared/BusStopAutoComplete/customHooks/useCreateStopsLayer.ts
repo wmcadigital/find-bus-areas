@@ -97,7 +97,7 @@ const useCreateStopsLayer = (view: any, autoCompleteId: string) => {
       // eslint-disable-next-line no-console
       console.log(error);
     }
-  }, [stopResults, map, autoCompleteId]);
+  }, [stopResults, selectedStops, map, autoCompleteId]);
 
   useEffect(() => {
     if (isStopsLayerCreated || !map) return;
