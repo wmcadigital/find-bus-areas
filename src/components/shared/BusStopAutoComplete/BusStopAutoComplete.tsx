@@ -36,6 +36,7 @@ const BusStopAutoComplete = ({
   const selectedItem = selectedStops.find((stop) => stop.autoCompleteId === id) || null;
   const { isStopsLayerCreated, setIsStopsLayerCreated } = useCreateStopsLayer(view, id);
   const { updateMapStops, selectedResult } = useUpdateStopsLayer();
+  const [stopResults, setStopResults] = useState<any>();
   // eslint-disable-next-line prettier/prettier
   const {
     results: locationResults,
@@ -48,11 +49,26 @@ const BusStopAutoComplete = ({
     )}&f=pjson`
   );
   const {
-    results: stopResults,
+    results: apiStopResults,
     loading: stopsLoading,
     getAPIResults: getStopAPIResults,
     errorInfo: stopErrorInfo,
   } = useBusStopAPI(location);
+
+  // Filter already selected stops from list
+  useEffect(() => {
+    if (apiStopResults.length && selectedStops.length) {
+      const filteredResults = apiStopResults.filter((result: any) => {
+        const match = selectedStops.find(
+          (stop) => stop.properties.atcoCode === result.properties.atcoCode
+        );
+        return !match && true;
+      });
+      setStopResults(filteredResults);
+    } else if (apiStopResults.length) {
+      setStopResults(apiStopResults);
+    }
+  }, [apiStopResults, selectedStops]);
 
   // Update selected stops state when map stop is selected
   useEffect(() => {
@@ -71,7 +87,7 @@ const BusStopAutoComplete = ({
 
   useEffect(() => {
     // When stop results are added, add nearest bus stops to map
-    if (mapView && stopResults.length > 0 && location && !selectedResult) {
+    if (mapView && stopResults?.length > 0 && location && !selectedResult) {
       mapDispatch({
         type: 'UPDATE_STOP_RESULTS',
         payload: { autoCompleteId: id, location, nearestStops: stopResults },
@@ -144,10 +160,10 @@ const BusStopAutoComplete = ({
             <>
               {!selectedItem?.properties && (
                 <div className="wmnds-m-b-md">
-                  {stopResults.length > 0 ? (
+                  {stopResults?.length > 0 ? (
                     <>
                       <p className="wmnds-m-b-md">Select your stop from the list</p>
-                      {stopResults.map((res) => (
+                      {stopResults.map((res: any) => (
                         <Button
                           key={`${id}-${res.properties.atcoCode}`}
                           text={`${res.properties.name}, (${
