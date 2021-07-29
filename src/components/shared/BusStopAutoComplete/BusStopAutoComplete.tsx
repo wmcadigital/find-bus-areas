@@ -11,18 +11,32 @@ import Loader from 'components/shared/Loader/Loader';
 // Import custom hooks
 import useLocationAPI from './customHooks/useLocationAPI';
 import useBusStopAPI from './customHooks/useBusStopAPI';
-import useAddStopsToMap from './customHooks/useUpdateMapStops';
 import useBusStopSelect from './customHooks/useBusStopSelect';
+import useCreateStopsLayer from './customHooks/useCreateStopsLayer';
+import useUpdateStopsLayer from './customHooks/useUpdateStopsLayer';
+// Import Helpers
+import metersToMiles from './helpers/metersToMiles';
 
-const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; name: string }) => {
+const BusStopAutoComplete = ({
+  id,
+  label,
+  name,
+  isReset,
+}: {
+  id: string;
+  label?: string;
+  name: string;
+  isReset: any;
+}) => {
   const [{ mapView, selectedStops }, formDispatch] = useFormContext();
-  const [{ view, busAreas, isStopsLayerCreated }, mapDispatch] = useMapContext();
+  const [{ view }, mapDispatch] = useMapContext();
   const [query, setQuery] = useState('');
-  const [mustUpdate, setMustUpdate] = useState(true);
+  const [mustUpdateSelection, setMustUpdateSelection] = useState(true);
   const [location, setLocation] = useState<any>();
   const { onBusStopSelect } = useBusStopSelect();
   const selectedItem = selectedStops.find((stop) => stop.autoCompleteId === id) || null;
-  const { updateMapStops, selectedResult } = useAddStopsToMap();
+  const { isStopsLayerCreated, setIsStopsLayerCreated } = useCreateStopsLayer(view, id);
+  const { updateMapStops, selectedResult } = useUpdateStopsLayer();
   // eslint-disable-next-line prettier/prettier
   const {
     results: locationResults,
@@ -39,18 +53,15 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
     loading: stopsLoading,
     getAPIResults: getStopAPIResults,
     errorInfo: stopErrorInfo,
-  } = useBusStopAPI();
+  } = useBusStopAPI(location);
 
-  const handleStopSelect = (result: any) => {
-    onBusStopSelect(id, location, result);
-  };
-
+  // Update selected stops state when map stop is selected
   useEffect(() => {
-    if (mapView && selectedResult && mustUpdate) {
+    if (mapView && selectedResult && mustUpdateSelection) {
       onBusStopSelect(id, location, selectedResult);
-      setMustUpdate(false);
+      setMustUpdateSelection(false);
     }
-  }, [id, location, mapView, onBusStopSelect, selectedResult, mustUpdate]);
+  }, [id, location, mapView, onBusStopSelect, selectedResult, mustUpdateSelection]);
 
   useEffect(() => {
     if (location?.location) {
@@ -61,45 +72,43 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
 
   useEffect(() => {
     // When stop results are added, add nearest bus stops to map
-    // const areas = Object.keys(busAreas).map((key) => busAreas[key]);
-    if (mapView && stopResults.length > 0) {
-      // areas.forEach((area) => {
-      //   view.map.findLayerById(area.id).visible = false;
-      // });
-
+    if (mapView && stopResults.length > 0 && location) {
       mapDispatch({
         type: 'UPDATE_STOP_RESULTS',
         payload: { autoCompleteId: id, location, nearestStops: stopResults },
       });
-      if (isStopsLayerCreated) {
-        updateMapStops(stopResults);
-      }
     }
-  }, [
-    mapView,
-    mapDispatch,
-    id,
-    location,
-    stopResults,
-    // view,
-    // busAreas,
-    updateMapStops,
-    isStopsLayerCreated,
-  ]);
+  }, [mapView, mapDispatch, id, location, stopResults, isStopsLayerCreated]);
 
+  useEffect(() => {
+    if (mapView && isStopsLayerCreated) {
+      updateMapStops(id, stopResults);
+    }
+  }, [mapView, stopResults, updateMapStops, isStopsLayerCreated, id]);
+
+  // set query state on input change
   const onUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   };
+  // set location on select
   const onSelect = (result: any) => {
     setLocation(result);
   };
+  // action when autocomplete is cleared
   const onClear = () => {
     setLocation(null);
     const payload = selectedStops.filter((stop) => stop.autoCompleteId !== id);
     formDispatch({ type: 'UPDATE_SELECTED_STOPS', payload });
-  };
-  const getMiles = (i: number) => {
-    return (i * 0.000621371192).toFixed(1);
+    if (view) {
+      updateMapStops(id, []);
+      const layerToRemove = view.map.findLayerById(id);
+      if (layerToRemove) {
+        view.map.layers.remove(layerToRemove);
+      }
+      setIsStopsLayerCreated(false);
+      console.log(view.map.layers);
+    }
+    isReset(true);
   };
 
   return (
@@ -144,12 +153,12 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
                         <Button
                           key={`${id}-${res.properties.atcoCode}`}
                           text={`${res.properties.name}, (${
-                            getMiles(res.properties.distance) < '0.1'
+                            metersToMiles(res.properties.distance) < '0.1'
                               ? '> 0.1'
-                              : getMiles(res.properties.distance)
+                              : metersToMiles(res.properties.distance)
                           } miles away)`}
                           btnClass="wmnds-btn--link wmnds-btn--align-left wmnds-m-b-sm"
-                          onClick={() => handleStopSelect(res)}
+                          onClick={() => onBusStopSelect(id, location, res)}
                         />
                       ))}
                     </>
@@ -175,4 +184,19 @@ const BusStopAutoComplete = ({ id, label, name }: { id: string; label?: string; 
   );
 };
 
-export default BusStopAutoComplete;
+const MountedAutoComplete = ({ id, label, name }: { id: string; label?: string; name: string }) => {
+  const [isCleared, setIsCleared] = useState(false);
+  useEffect(() => {
+    if (isCleared) setIsCleared(false);
+  }, [isCleared]);
+
+  return (
+    <>
+      {!isCleared && (
+        <BusStopAutoComplete id={id} label={label} name={name} isReset={setIsCleared} />
+      )}
+    </>
+  );
+};
+
+export default MountedAutoComplete;

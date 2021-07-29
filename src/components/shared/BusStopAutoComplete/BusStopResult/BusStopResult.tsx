@@ -3,7 +3,7 @@ import { useFormContext, useMapContext } from 'globalState';
 import useToggleBusAreas from 'globalState/customHooks/useToggleBusAreas';
 import Button from 'components/shared/Button/Button';
 import Icon from 'components/shared/Icon/Icon';
-import useClearSearch from 'components/shared/ClearSearch/useClearSearch';
+import useClearSearch from 'components/shared/BusStopSearch/useClearSearch';
 import arrayToSentence from 'globalState/helpers/arrayToSentence';
 import Radio from 'components/shared/Radios/Radio/Radio';
 import useRecommendedBusArea from './useRecommendedBusArea';

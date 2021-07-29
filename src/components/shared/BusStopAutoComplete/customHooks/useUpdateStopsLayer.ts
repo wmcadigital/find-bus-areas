@@ -6,74 +6,74 @@ import { useMapContext, useFormContext } from 'globalState';
 import { loadModules } from 'esri-loader';
 // import mapMarker from 'assets/svgs/map/map-marker.svg';
 
-const useUpdateMapStops = () => {
+const useUpdateStopsLayer = () => {
   const [{ view }] = useMapContext();
   const [{ selectedStops }] = useFormContext();
   const [selectedResult, setSelectedResult] = useState<any>(null);
 
   const updateMapStops = useCallback(
-    async (stopResults: any) => {
+    async (id: any, stopResults?: any) => {
       try {
         const [Graphic] = await loadModules(['esri/Graphic']);
-        if (view) {
-          const graphics: any = [];
+        const busStopsLayer = await view.map.findLayerById(id);
+
+        const applyEditsToLayer = (edits: any) => {
+          busStopsLayer
+            .applyEdits(edits)
+            .then((res: any) => {
+              // if edits were removed
+              if (res.deleteFeatureResults.length > 0) {
+                console.log(res.deleteFeatureResults.length, 'features have been removed');
+              }
+
+              // if features were added - call queryFeatures to return
+              // newly added graphics
+              if (res.addFeatureResults.length > 0) {
+                const objectIds: any = [];
+                res.addFeatureResults.forEach((item: any) => {
+                  objectIds.push(item.objectId);
+                });
+                // query the newly added features from the layer
+                const stopsQuery = busStopsLayer.createQuery();
+                stopsQuery.returnGeometry = true;
+                busStopsLayer
+                  .queryFeatures(stopsQuery, {
+                    objectIds,
+                  })
+                  .then((results: any) => {
+                    console.log(results.features.length, 'features have been added.');
+                    if (results.features.length) {
+                      view.goTo(results.features);
+                    }
+                  });
+              }
+            })
+            .catch((error: any) => {
+              // eslint-disable-next-line no-console
+              console.log(error);
+            });
+        };
+
+        if (view && stopResults) {
           const graphicsToAdd = [...stopResults, ...selectedStops];
 
-          graphicsToAdd.forEach((result: any) => {
-            const nearestStopGraphics = new Graphic({
+          const graphics = graphicsToAdd.map((graphic: any) => {
+            return new Graphic({
               attributes: {
-                name: result.properties.name,
-                atcoCode: result.properties.atcoCode,
-                busArea: result.stopBusAreas[0],
+                name: graphic.properties.name,
+                atcoCode: graphic.properties.atcoCode,
+                busArea: graphic.stopBusAreas[0],
               },
               geometry: {
                 type: 'point',
-                longitude: result.geometry.coordinates[0],
-                latitude: result.geometry.coordinates[1],
+                longitude: graphic.geometry.coordinates[0],
+                latitude: graphic.geometry.coordinates[1],
                 spatialreference: {
                   wkid: 4326,
                 },
               },
             });
-            graphics.push(nearestStopGraphics);
           });
-
-          const busStopsLayer = await view.map.findLayerById('busStopsLayer');
-
-          const applyEditsToLayer = (edits: any) => {
-            busStopsLayer
-              .applyEdits(edits)
-              .then((res: any) => {
-                // if edits were removed
-                if (res.deleteFeatureResults.length > 0) {
-                  console.log(res.deleteFeatureResults.length, 'features have been removed');
-                }
-                // if features were added - call queryFeatures to return
-                //    newly added graphics
-                if (res.addFeatureResults.length > 0) {
-                  const objectIds: any = [];
-                  res.addFeatureResults.forEach((item: any) => {
-                    objectIds.push(item.objectId);
-                  });
-                  const stopsQuery = busStopsLayer.createQuery();
-                  stopsQuery.returnGeometry = true;
-                  // query the newly added features from the layer
-                  busStopsLayer
-                    .queryFeatures(stopsQuery, {
-                      objectIds,
-                    })
-                    .then((results: any) => {
-                      console.log(results.features.length, 'features have been added.');
-                      if (results.features.length) {
-                        view.goTo(results.features);
-                      }
-                    });
-                }
-              })
-              .catch((error: any) => {
-                console.log(error);
-              });
-          };
 
           view.popup.visibleElements = {
             featureNavigation: false,
@@ -108,10 +108,16 @@ const useUpdateMapStops = () => {
           });
 
           if (busStopsLayer) {
-            const edits = {
-              addFeatures: graphics,
-            };
-            applyEditsToLayer(edits);
+            busStopsLayer.queryFeatures().then((results: any) => {
+              const graphicsToRemove = results.features;
+              const edits = {
+                addFeatures: graphics,
+                deleteFeatures: graphicsToRemove,
+              };
+              console.log(edits);
+              // apply edits to the layer
+              applyEditsToLayer(edits);
+            });
           }
         }
       } catch (error) {
@@ -125,4 +131,4 @@ const useUpdateMapStops = () => {
   return { updateMapStops, selectedResult };
 };
 
-export default useUpdateMapStops;
+export default useUpdateStopsLayer;

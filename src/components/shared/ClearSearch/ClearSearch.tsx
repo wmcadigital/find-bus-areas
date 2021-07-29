@@ -1,6 +1,6 @@
 import Button from 'components/shared/Button/Button';
 
-import useClearSearch from './useClearSearch';
+import useClearSearch from '../BusStopSearch/useClearSearch';
 
 const ClearSearch = () => {
   const { clearSearch } = useClearSearch();

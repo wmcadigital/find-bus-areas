@@ -9,6 +9,7 @@ export type MapState = {
   stopResults: any;
   busAreas: BusArea;
   isStopsLayerCreated: boolean;
+  isMapCleared: boolean;
 };
 
 export type MapStateAction =
@@ -27,6 +28,10 @@ export type MapStateAction =
   | {
       type: 'ADD_AREAS';
       payload: BusArea;
+    }
+  | {
+      type: 'RESET_FORM';
+      payload: boolean;
     }
   | {
       type: 'MOUNT_STOPS_LAYER';

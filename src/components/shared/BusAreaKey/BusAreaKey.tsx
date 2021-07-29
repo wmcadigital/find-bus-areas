@@ -5,7 +5,7 @@ import Checkbox from '../Checkbox/Checkbox';
 import s from './BusAreaKey.module.scss';
 
 const BusAreaKey = () => {
-  const [showKey, setShowKey] = useState(false);
+  const [showKey, setShowKey] = useState(true);
   const { view, busAreasArray, toggleBusArea } = useToggleBusAreas();
 
   return (

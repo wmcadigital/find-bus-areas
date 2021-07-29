@@ -8,6 +8,7 @@ export const initialState = (() => {
     stopResults: {},
     busAreas: {},
     isStopsLayerCreated: false,
+    isMapCleared: false,
   };
 
   return state;
@@ -23,6 +24,8 @@ export const reducer = (state = initialState, action: TMap.MapStateAction): TMap
       return { ...state, isStopsLayerCreated: action.payload };
     case 'ADD_AREAS':
       return { ...state, busAreas: action.payload };
+    case 'RESET_FORM':
+      return { ...state, isMapCleared: action.payload };
     case 'TOGGLE_AREA':
       return {
         ...state,

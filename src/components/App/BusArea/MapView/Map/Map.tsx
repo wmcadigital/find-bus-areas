@@ -1,20 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // Using https://developers.arcgis.com/javascript/latest/api-reference/ and ESRI JS API
-import { useRef, useEffect, useCallback } from 'react';
-import { loadModules } from 'esri-loader';
+import { useRef, useEffect } from 'react';
 import { useMapContext } from 'globalState';
 import s from './Map.module.scss';
 import './Map.scss';
 // Import custom hooks for map functionality
 import useCreateMapView from './customHooks/useCreateMapView';
-import useCreateStopsLayer from './customHooks/useCreateStopsLayer';
 
 const Map = () => {
   // MAP SETUP
   const mapContainerRef = useRef<any>();
   const [mapState, mapDispatch] = useMapContext();
   const view = useCreateMapView(mapContainerRef);
-  const isStopsLayerCreated = useCreateStopsLayer(view);
 
   useEffect(() => {
     if (view) {

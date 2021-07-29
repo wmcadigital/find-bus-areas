@@ -8,7 +8,7 @@ interface IError {
   isTimeoutError?: boolean;
 }
 
-const useBusStopAPI = () => {
+const useBusStopAPI = (location: any) => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); // Set loading state for spinner
   const [errorInfo, setErrorInfo] = useState<IError | null>(null); // Placeholder to set error messaging
@@ -103,13 +103,15 @@ const useBusStopAPI = () => {
   );
 
   useEffect(() => {
+    if (!location) setResults([]);
     // Unmount / cleanup
     return () => {
       mounted.current = false; // Set mounted back to false on unmount
+      setResults([]); // clear results on unmount
       cancelRequest(); // cancel the request
       clearApiTimeout(); // clear timeout
     };
-  }, []);
+  }, [location]);
 
   return { loading, errorInfo, results, getAPIResults };
 };
