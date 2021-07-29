@@ -57,7 +57,7 @@ const useRecommendedBusArea = () => {
         recommendedBusArea = ['Black Country'];
       }
     }
-    setRecommendation({ options: recommendedBusArea, text: recommendedBusArea.join(' or ') });
+    setRecommendation(recommendedBusArea);
   }, [selectedStops]);
 
   return recommendedAreas;

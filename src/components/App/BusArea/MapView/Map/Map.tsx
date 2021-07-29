@@ -30,7 +30,9 @@ const Map = () => {
       const visibleBusAreas = busAreasArray
         .filter((area: any) => area.visible)
         .map((area: any) => area.geometry.coordinates);
-      if (visibleBusAreas.length > 0) mapState.view.goTo(visibleBusAreas);
+      if (visibleBusAreas.length > 0) {
+        mapState.view.goTo(visibleBusAreas);
+      }
     }
   }, [mapState.view, mapState.busAreas]);
 

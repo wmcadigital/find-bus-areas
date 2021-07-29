@@ -14,33 +14,42 @@ function BusStopResult() {
   const { toggleBusArea, busAreasArray } = useToggleBusAreas();
   const { clearSearch } = useClearSearch();
   const recommendedAreas = useRecommendedBusArea();
-  const [selectedArea, setSelectedArea] = useState(null);
+  const [selectedArea, setSelectedArea] = useState<any>(null);
   const [valid, setValid] = useState(false);
-  const [completed, setCompleted] = useState(false);
+  const [shouldToggleAreas, setShouldToggleAreas] = useState(true);
 
   useEffect(() => {
-    if (!selectedArea) {
-      setSelectedArea(recommendedAreas?.text);
+    if (!selectedArea && recommendedAreas) {
+      setSelectedArea(recommendedAreas);
     }
-    if (!completed) {
-      if (valid) {
-        setValid(true);
+    if (recommendedAreas?.length === 1) {
+      setValid(true);
+    }
+  }, [selectedArea, recommendedAreas]);
+
+  useEffect(() => {
+    if (view) {
+      if (shouldToggleAreas) {
+        const toggleAreas = async () => {
+          busAreasArray.forEach((area) => {
+            if (selectedArea && selectedArea.includes(area.properties.area_name)) {
+              toggleBusArea(area, true);
+            } else {
+              toggleBusArea(area, false);
+            }
+          });
+        };
+        toggleAreas().then(() => {
+          setShouldToggleAreas(false);
+        });
       }
-      setCompleted(true);
-      busAreasArray.forEach((area) => {
-        if (selectedArea === area.properties.area_name) {
-          toggleBusArea(area, true);
-        } else {
-          toggleBusArea(area, false);
-        }
-      });
     }
-  }, [view, completed, valid, selectedArea, recommendedAreas, busAreasArray, toggleBusArea]);
+  }, [busAreasArray, selectedArea, shouldToggleAreas, toggleBusArea, view]);
 
   const handleRadioChange = (e: any) => {
     setSelectedArea(e.target.value);
+    setShouldToggleAreas(true);
     setValid(true);
-    setCompleted(false);
   };
 
   return (
@@ -58,17 +67,17 @@ function BusStopResult() {
           ))}
           <div className="wmnds-p-md wmnds-m-b-lg wmnds-msg-help">
             To travel between these bus stops, you’ll need a{' '}
-            <strong>{recommendedAreas.text} bus area</strong> ticket.
+            <strong>{recommendedAreas.join(' or ')} bus area</strong> ticket.
           </div>
           {ticketSearch && (
             <>
-              {recommendedAreas.options.length > 1 && (
+              {recommendedAreas.length > 1 && (
                 <div className="wmnds-fe-group wmnds-m-b-md">
                   <fieldset className="wmnds-fe-fieldset">
                     <legend className="wmnds-fe-fieldset__legend">
                       <h3>Please select your preferred area</h3>
                     </legend>
-                    {recommendedAreas.options.map((option: any) => (
+                    {recommendedAreas.map((option: any) => (
                       <Radio
                         key={option}
                         name="busArea"

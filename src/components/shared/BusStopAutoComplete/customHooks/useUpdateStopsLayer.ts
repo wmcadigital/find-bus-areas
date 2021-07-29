@@ -20,33 +20,14 @@ const useUpdateStopsLayer = () => {
         const applyEditsToLayer = (edits: any) => {
           busStopsLayer
             .applyEdits(edits)
-            .then((res: any) => {
-              // if edits were removed
-              // if (res.deleteFeatureResults.length > 0) {
-              //   console.log(res.deleteFeatureResults.length, 'features have been removed');
-              // }
-
-              // if features were added - call queryFeatures to return
-              // newly added graphics
-              if (res.addFeatureResults.length > 0) {
-                const objectIds: any = [];
-                res.addFeatureResults.forEach((item: any) => {
-                  objectIds.push(item.objectId);
-                });
-                // query the newly added features from the layer
-                const stopsQuery = busStopsLayer.createQuery();
-                stopsQuery.returnGeometry = true;
-                busStopsLayer
-                  .queryFeatures(stopsQuery, {
-                    objectIds,
-                  })
-                  .then((results: any) => {
-                    // console.log(results.features.length, 'features have been added.');
-                    if (results.features.length) {
-                      view.goTo(results.features);
-                    }
-                  });
-              }
+            .then(() => {
+              const stopsQuery = busStopsLayer.createQuery();
+              stopsQuery.returnGeometry = true;
+              busStopsLayer.queryFeatures(stopsQuery).then((results: any) => {
+                if (results.features.length) {
+                  view.goTo(results.features);
+                }
+              });
             })
             .catch((error: any) => {
               // eslint-disable-next-line no-console
