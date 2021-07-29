@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useCallback, useRef } from 'react';
 // eslint-disable-next-line import/no-unresolved
@@ -17,27 +16,17 @@ const useCreateMapView = (mapContainerRef: any) => {
   const createMapView = useCallback(async () => {
     try {
       setDefaultOptions({ css: true }); // Load esri css by default
-      const [
-        Map,
-        MapView,
-        Basemap,
-        VectorTileLayer,
-        Graphic,
-        Locate,
-        GraphicsLayer,
-        Polygon,
-        FeatureLayer,
-      ] = await loadModules([
-        'esri/Map',
-        'esri/views/MapView',
-        'esri/Basemap',
-        'esri/layers/VectorTileLayer',
-        'esri/Graphic',
-        'esri/widgets/Locate',
-        'esri/layers/GraphicsLayer',
-        'esri/geometry/Polygon',
-        'esri/layers/FeatureLayer',
-      ]);
+      const [Map, MapView, Basemap, VectorTileLayer, Graphic, Locate, GraphicsLayer, Polygon] =
+        await loadModules([
+          'esri/Map',
+          'esri/views/MapView',
+          'esri/Basemap',
+          'esri/layers/VectorTileLayer',
+          'esri/Graphic',
+          'esri/widgets/Locate',
+          'esri/layers/GraphicsLayer',
+          'esri/geometry/Polygon',
+        ]);
 
       const basemap = new Basemap({
         baseLayers: [
@@ -110,7 +99,7 @@ const useCreateMapView = (mapContainerRef: any) => {
       });
 
       const wmArea = busAreas.current.map((area: any) => area.geometry.coordinates);
-      view.goTo(wmArea).then(() => console.log(wmArea));
+      view.goTo(wmArea);
 
       setViewState(view);
       setIsCreated(true);

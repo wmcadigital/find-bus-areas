@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 // Import context
 import { useFormContext, useMapContext } from 'globalState';
 // eslint-disable-next-line import/no-unresolved
@@ -185,7 +184,7 @@ const BusStopAutoComplete = ({
 
 const MountedAutoComplete = ({ id, label, name }: { id: string; label?: string; name: string }) => {
   const [isCleared, setIsCleared] = useState(false);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isCleared) setIsCleared(false);
   }, [isCleared]);
 

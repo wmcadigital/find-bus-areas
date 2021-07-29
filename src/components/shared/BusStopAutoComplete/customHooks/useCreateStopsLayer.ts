@@ -1,21 +1,27 @@
 import { useEffect, useState, useCallback } from 'react';
 import { loadModules } from 'esri-loader';
-import { useMapContext } from 'globalState';
+import { useMapContext, useFormContext } from 'globalState';
 import mapMarker from 'assets/svgs/map/map-marker.svg';
 
 const useCreateStopsLayer = (view: any, autoCompleteId: string) => {
   const [isStopsLayerCreated, setIsStopsLayerCreated] = useState(false);
   const map = view !== null && view?.map;
 
+  const [{ selectedStops }] = useFormContext();
   const [{ stopResults }] = useMapContext();
 
   const createStopsLayer = useCallback(async () => {
     try {
-      if (!stopResults?.nearestStops) return;
+      const selectedStop = selectedStops.find(
+        (stop: any) => stop.autoCompleteId === autoCompleteId && stop.properties
+      );
+      if (!stopResults?.nearestStops && !selectedStop) return;
       const [FeatureLayer] = await loadModules(['esri/layers/FeatureLayer']);
-      const busStopGraphics: any = [];
-      stopResults?.nearestStops.forEach((result: any) => {
-        const graphic = {
+
+      const graphicsToAdd = [...(!selectedStop ? stopResults?.nearestStops : [selectedStop])];
+
+      const busStopGraphics = graphicsToAdd.map((result: any) => {
+        return {
           attributes: {
             name: result.properties.name,
             atcoCode: result.properties.atcoCode,
@@ -30,7 +36,6 @@ const useCreateStopsLayer = (view: any, autoCompleteId: string) => {
             },
           },
         };
-        busStopGraphics.push(graphic);
       });
 
       const stopsLayer = new FeatureLayer({

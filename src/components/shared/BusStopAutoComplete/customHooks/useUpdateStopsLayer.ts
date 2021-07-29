@@ -22,9 +22,9 @@ const useUpdateStopsLayer = () => {
             .applyEdits(edits)
             .then((res: any) => {
               // if edits were removed
-              if (res.deleteFeatureResults.length > 0) {
-                console.log(res.deleteFeatureResults.length, 'features have been removed');
-              }
+              // if (res.deleteFeatureResults.length > 0) {
+              //   console.log(res.deleteFeatureResults.length, 'features have been removed');
+              // }
 
               // if features were added - call queryFeatures to return
               // newly added graphics
@@ -41,7 +41,7 @@ const useUpdateStopsLayer = () => {
                     objectIds,
                   })
                   .then((results: any) => {
-                    console.log(results.features.length, 'features have been added.');
+                    // console.log(results.features.length, 'features have been added.');
                     if (results.features.length) {
                       view.goTo(results.features);
                     }
@@ -122,7 +122,6 @@ const useUpdateStopsLayer = () => {
                 addFeatures: graphics,
                 deleteFeatures: graphicsToRemove,
               };
-              console.log(edits);
               // apply edits to the layer
               applyEditsToLayer(edits);
             });

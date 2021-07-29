@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useMapContext, useFormContext } from 'globalState';
 import Button from 'components/shared/Button/Button';
 import BusStopAutoComplete from 'components/shared/BusStopAutoComplete/BusStopAutoComplete';
@@ -13,7 +13,7 @@ const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
   const [{ isMapCleared }, mapDispatch] = useMapContext();
 
   // Force autocomplete components to unmount to reset all of the data
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isMapCleared) {
       mapDispatch({ type: 'RESET_FORM', payload: false });
     }
