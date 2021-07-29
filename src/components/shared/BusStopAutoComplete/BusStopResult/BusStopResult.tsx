@@ -52,6 +52,18 @@ function BusStopResult() {
     setValid(true);
   };
 
+  const sortAreas = (area: any) => {
+    const areaOrder: any = {
+      'West Midlands': 5,
+      'Black Country': 4,
+      'Sandwell and Dudley': 3,
+      Walsall: 2,
+      Coventry: 1,
+    };
+    return area.sort((a: any, b: any) => {
+      return areaOrder[a] - areaOrder[b];
+    });
+  };
   return (
     <div className="wmnds-p-b-lg">
       {recommendedAreas && (
@@ -61,7 +73,8 @@ function BusStopResult() {
             <p key={stop.properties.atcoCode}>
               {stop.properties.name} is in the{' '}
               <strong>
-                {arrayToSentence(stop.stopBusAreas)} bus area{stop.stopBusAreas.length > 1 && 's'}.
+                {arrayToSentence(sortAreas(stop.stopBusAreas))} bus area
+                {stop.stopBusAreas.length > 1 && 's'}.
               </strong>
             </p>
           ))}
