@@ -80,9 +80,11 @@ const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
       {mapView && (
         <div>
           {selectedStops.length > 1 && selectedStops.every((stop) => stop.properties) && (
-            <BusStopResult />
+            <>
+              <BusStopResult />
+              <BusAreaKey />
+            </>
           )}
-          <BusAreaKey />
         </div>
       )}
     </div>

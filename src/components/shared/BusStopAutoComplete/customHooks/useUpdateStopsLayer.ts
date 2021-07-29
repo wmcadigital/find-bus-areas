@@ -7,7 +7,7 @@ import { loadModules } from 'esri-loader';
 // import mapMarker from 'assets/svgs/map/map-marker.svg';
 
 const useUpdateStopsLayer = () => {
-  const [{ view }] = useMapContext();
+  const [{ view }, mapDispatch] = useMapContext();
   const [{ selectedStops }] = useFormContext();
   const [selectedResult, setSelectedResult] = useState<any>(null);
 
@@ -55,7 +55,10 @@ const useUpdateStopsLayer = () => {
         };
 
         if (view && stopResults) {
-          const graphicsToAdd = [...stopResults, ...selectedStops];
+          const selectedStop = selectedStops.find(
+            (stop: any) => stop.autoCompleteId === id && stop.properties
+          );
+          const graphicsToAdd = [...(!selectedStop ? stopResults : [selectedStop])];
 
           const graphics = graphicsToAdd.map((graphic: any) => {
             return new Graphic({
@@ -88,11 +91,16 @@ const useUpdateStopsLayer = () => {
               );
 
               setSelectedResult(result);
+              // reset stop results
+              mapDispatch({
+                type: 'UPDATE_STOP_RESULTS',
+                payload: {},
+              });
               if (busStopsLayer && result) {
                 busStopsLayer.queryFeatures().then((results: any) => {
                   // edits object tells apply edits that you want to delete the features
                   // filter out the results that have been selected
-                  const selectedStopNames = selectedStops.map((stop) => stop.properties.name);
+                  const selectedStopNames = selectedStops.map((stop) => stop.properties?.name);
                   const graphicsToRemove = results.features.filter(
                     (r: any) => !selectedStopNames.includes(r.attributes.name)
                   );
@@ -125,7 +133,7 @@ const useUpdateStopsLayer = () => {
         console.log(error);
       }
     },
-    [view, selectedStops]
+    [view, selectedStops, mapDispatch]
   );
 
   return { updateMapStops, selectedResult };

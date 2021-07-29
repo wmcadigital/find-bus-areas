@@ -72,13 +72,13 @@ const BusStopAutoComplete = ({
 
   useEffect(() => {
     // When stop results are added, add nearest bus stops to map
-    if (mapView && stopResults.length > 0 && location) {
+    if (mapView && stopResults.length > 0 && location && !selectedResult) {
       mapDispatch({
         type: 'UPDATE_STOP_RESULTS',
         payload: { autoCompleteId: id, location, nearestStops: stopResults },
       });
     }
-  }, [mapView, mapDispatch, id, location, stopResults, isStopsLayerCreated]);
+  }, [mapView, mapDispatch, id, location, stopResults, isStopsLayerCreated, selectedResult]);
 
   useEffect(() => {
     if (mapView && isStopsLayerCreated) {
@@ -106,7 +106,6 @@ const BusStopAutoComplete = ({
         view.map.layers.remove(layerToRemove);
       }
       setIsStopsLayerCreated(false);
-      console.log(view.map.layers);
     }
     isReset(true);
   };

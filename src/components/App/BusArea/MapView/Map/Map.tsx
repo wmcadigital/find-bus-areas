@@ -14,6 +14,7 @@ const Map = () => {
 
   useEffect(() => {
     if (view) {
+      console.log(view);
       mapDispatch({ type: 'ADD_VIEW', payload: view });
     }
     return () => {
