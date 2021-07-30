@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import Icon from 'components/shared/Icon/Icon';
+import { DebounceInput } from 'react-debounce-input';
 import {
   AutoCompleteProvider,
   useAutoCompleteContext,
@@ -78,7 +79,7 @@ const AutoComplete = ({
             <div className="wmnds-loader" role="alert" aria-live="assertive">
               <p className="wmnds-loader__content">Content is loading...</p>
             </div>
-            <input
+            <DebounceInput
               id={id}
               name={name}
               autoComplete="off"
@@ -87,6 +88,7 @@ const AutoComplete = ({
               className={`wmnds-fe-input wmnds-autocomplete__input wmnds-col-1 ${className}`}
               type={type}
               value={query}
+              debounceTimeout={600}
               onChange={handleChange}
               onKeyDown={(e) => handleKeyDown(e)}
               ref={inputRef}
@@ -95,7 +97,7 @@ const AutoComplete = ({
           {/* If there is no data.length(results) and the user hasn't submitted a query and the state isn't loading then the user should be displayed with no results message, else show results */}
           {results && (
             <>
-              {!results.length && query.length && !loading
+              {!results.length && query.length > 1 && !loading
                 ? errorMessage
                 : // Only show autocomplete results if there is a query
                   query.length > 0 && (
