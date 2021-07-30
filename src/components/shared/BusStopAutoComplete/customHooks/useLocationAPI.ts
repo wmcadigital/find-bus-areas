@@ -30,14 +30,20 @@ const useLocationAPI = (apiPath: string) => {
   const clearApiTimeout = () => clearTimeout(apiTimeout.current);
 
   const handleApiResponse = useCallback((response) => {
-    if (response.data.candidates?.length > 0)
-      setResults(
-        response.data.candidates.map((addr: any, i: number) => ({
-          id: `${addr.address.replace(/\W/g, '_')}_${i}`, // makeshift id from address
-          name: addr.address,
-          ...addr,
-        }))
-      );
+    const validResults = response.data.candidates.map((addr: any, i: number) => ({
+      id: `${addr.address.replace(/\W/g, '_')}_${i}`, // makeshift id from address
+      name: addr.address,
+      ...addr,
+    }));
+    if (validResults?.length > 0) {
+      setResults(validResults);
+    } else {
+      setErrorInfo({
+        // Update error message
+        title: 'Please try another location',
+        message: 'No west midlands bus stops were found near to your search area',
+      });
+    }
     clearApiTimeout();
     setLoading(false);
   }, []);

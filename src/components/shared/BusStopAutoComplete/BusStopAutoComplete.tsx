@@ -36,7 +36,7 @@ const BusStopAutoComplete = ({
   const selectedItem = selectedStops.find((stop) => stop.autoCompleteId === id) || null;
   const { isStopsLayerCreated, setIsStopsLayerCreated } = useCreateStopsLayer(view, id);
   const { updateMapStops, selectedResult } = useUpdateStopsLayer();
-  const [stopResults, setStopResults] = useState<any>();
+  const [stopResults, setStopResults] = useState<any>([]);
   // eslint-disable-next-line prettier/prettier
   const {
     results: locationResults,
@@ -125,6 +125,16 @@ const BusStopAutoComplete = ({
     isReset(true);
   };
 
+  const errorMessage = (
+    <Message
+      type="error"
+      title={errorInfo?.title}
+      message={errorInfo?.message}
+      showRetry={errorInfo?.isTimeoutError}
+      retryCallback={getAPIResults}
+    />
+  );
+
   return (
     <>
       <div className="wmnds-m-b-md">
@@ -139,15 +149,7 @@ const BusStopAutoComplete = ({
           onSelectResult={onSelect}
           results={locationResults}
           loading={loading}
-          errorMessage={
-            <Message
-              type="error"
-              title={errorInfo?.title}
-              message={errorInfo?.message}
-              showRetry={errorInfo?.isTimeoutError}
-              retryCallback={getAPIResults}
-            />
-          }
+          errorMessage={errorMessage}
         />
       </div>
       {!mapView && location && (
@@ -190,9 +192,15 @@ const BusStopAutoComplete = ({
         </>
       )}
       {mapView && location && !selectedItem?.properties && (
-        <div className="wmnds-msg-help">
-          Select your bus stop from the map and confirm your bus stop in the pop-up box
-        </div>
+        <>
+          {stopResults?.length > 0 ? (
+            <div className="wmnds-msg-help">
+              Select your bus stop from the map and confirm your bus stop in the pop-up box
+            </div>
+          ) : (
+            <Message type="error" title={stopErrorInfo?.title} message={stopErrorInfo?.message} />
+          )}
+        </>
       )}
     </>
   );
