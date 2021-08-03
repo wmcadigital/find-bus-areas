@@ -51,6 +51,7 @@ const useBusStopAPI = (location: any) => {
 
       if (stopResults.length > 0) {
         setResults(stopResults);
+        setErrorInfo(null);
       } else {
         setResults([]);
         setErrorInfo({

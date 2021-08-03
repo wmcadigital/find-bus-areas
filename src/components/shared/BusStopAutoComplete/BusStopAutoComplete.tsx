@@ -198,7 +198,9 @@ const BusStopAutoComplete = ({
               Select your bus stop from the map and confirm your bus stop in the pop-up box
             </div>
           ) : (
-            <Message type="error" title={stopErrorInfo?.title} message={stopErrorInfo?.message} />
+            stopErrorInfo && (
+              <Message type="error" title={stopErrorInfo?.title} message={stopErrorInfo?.message} />
+            )
           )}
         </>
       )}
