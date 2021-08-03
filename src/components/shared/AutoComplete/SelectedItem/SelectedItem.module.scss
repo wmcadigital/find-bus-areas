@@ -19,10 +19,12 @@
   display: block;
   width: 100%;
   align-self: center;
+  flex-basis: calc(100% - (115px));
+  flex-grow: 1;
 
   @media all and (min-width: 360px) {
-    max-width: calc(100% - (115px));
     margin-top: 0;
     margin-right: $size-md;
+    flex-wrap: nowrap;
   }
 }
