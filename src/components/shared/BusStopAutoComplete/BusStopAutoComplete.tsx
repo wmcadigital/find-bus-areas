@@ -60,7 +60,7 @@ const BusStopAutoComplete = ({
     if (apiStopResults.length && selectedStops.length) {
       const filteredResults = apiStopResults.filter((result: any) => {
         const match = selectedStops.find(
-          (stop) => stop.properties.atcoCode === result.properties.atcoCode
+          (stop) => stop.properties?.atcoCode === result.properties?.atcoCode
         );
         return !match && true;
       });
@@ -194,7 +194,7 @@ const BusStopAutoComplete = ({
       {!listView && location && !selectedItem?.properties && (
         <>
           {stopResults?.length > 0 ? (
-            <div className="wmnds-msg-help">
+            <div className="wmnds-msg-help wmnds-m-b-md">
               Select your bus stop from the map and confirm your bus stop in the pop-up box
             </div>
           ) : (
