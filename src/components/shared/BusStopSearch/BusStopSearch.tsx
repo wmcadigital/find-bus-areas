@@ -9,7 +9,7 @@ import BusStopResult from '../BusStopAutoComplete/BusStopResult/BusStopResult';
 import s from './BusStopSearch.module.scss';
 
 const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
-  const [{ mapView, selectedStops }, formDispatch] = useFormContext();
+  const [{ listView, selectedStops }, formDispatch] = useFormContext();
   const [{ isMapCleared }, mapDispatch] = useMapContext();
 
   // Force autocomplete components to unmount to reset all of the data
@@ -27,7 +27,7 @@ const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
   };
   return (
     <div className={`${s.traySearchContainer} wmnds-p-b-lg`}>
-      {mapView && <ClearSearch />}
+      {!listView && <ClearSearch />}
       <p className="h3">All companies (nBus and nNetwork)</p>
       <p className="h4 wmnds-m-b-lg">Find out which bus areas specific stops are in</p>
       <ol className="wmnds-in-text-step">
@@ -35,10 +35,10 @@ const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
           Search for a postcode, road name or point of interest
         </li>
         <li className="wmnds-in-text-step__item">
-          Select a bus stop from the {mapView ? 'map' : 'list'}
+          Select a bus stop from the {listView ? 'list' : 'map'}
         </li>
       </ol>
-      {!mapView && <ClearSearch />}
+      {listView && <ClearSearch />}
       {!isMapCleared && (
         <>
           <BusStopAutoComplete id="selectedStopFrom" label="From:" name="BusStopFrom" />
@@ -55,8 +55,8 @@ const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
         </>
       )}
       {selectedStops.length >= 2 && (
-        <div className={`wmnds-grid wmnds-m-b-lg ${mapView ? '' : 'wmnds-grid--spacing-2-md'}`}>
-          <div className={mapView ? 'wmnds-col-1' : 'wmnds-col-1-2'}>
+        <div className={`wmnds-grid wmnds-m-b-lg ${!listView ? '' : 'wmnds-grid--spacing-2-md'}`}>
+          <div className={!listView ? 'wmnds-col-1' : 'wmnds-col-1-2'}>
             <Button
               btnClass={`wmnds-btn--primary wmnds-col-1 ${s.addBtn}`}
               iconRight="general-expand"
@@ -65,7 +65,7 @@ const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
               disabled={selectedStops.length >= 12}
             />
           </div>
-          {!mapView && (
+          {listView && (
             <div className="wmnds-col-1-2">
               <Button
                 btnClass="wmnds-col-1"
@@ -77,7 +77,7 @@ const BusStopSearch = ({ onComplete }: { onComplete?: () => void }) => {
           )}
         </div>
       )}
-      {mapView && (
+      {!listView && (
         <div>
           {selectedStops.length > 1 && selectedStops.every((stop) => stop.properties) && (
             <>

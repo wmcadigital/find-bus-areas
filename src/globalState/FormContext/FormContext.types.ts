@@ -1,5 +1,5 @@
 export type State = {
-  mapView: boolean;
+  listView: boolean;
   ticketSearch: boolean;
   selectedStops: any[];
   showResult: boolean;

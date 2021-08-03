@@ -27,7 +27,7 @@ const BusStopAutoComplete = ({
   name: string;
   isReset: any;
 }) => {
-  const [{ mapView, selectedStops }, formDispatch] = useFormContext();
+  const [{ listView, selectedStops }, formDispatch] = useFormContext();
   const [{ view }, mapDispatch] = useMapContext();
   const [query, setQuery] = useState('');
   const [mustUpdateSelection, setMustUpdateSelection] = useState(true);
@@ -72,11 +72,11 @@ const BusStopAutoComplete = ({
 
   // Update selected stops state when map stop is selected
   useEffect(() => {
-    if (mapView && selectedResult && mustUpdateSelection) {
+    if (!listView && selectedResult && mustUpdateSelection) {
       onBusStopSelect(id, location, selectedResult);
       setMustUpdateSelection(false);
     }
-  }, [id, location, mapView, onBusStopSelect, selectedResult, mustUpdateSelection]);
+  }, [id, location, listView, onBusStopSelect, selectedResult, mustUpdateSelection]);
 
   useEffect(() => {
     if (location?.location) {
@@ -87,19 +87,19 @@ const BusStopAutoComplete = ({
 
   useEffect(() => {
     // When stop results are added, add nearest bus stops to map
-    if (mapView && stopResults?.length > 0 && location && !selectedResult) {
+    if (!listView && stopResults?.length > 0 && location && !selectedResult) {
       mapDispatch({
         type: 'UPDATE_STOP_RESULTS',
         payload: { autoCompleteId: id, location, nearestStops: stopResults },
       });
     }
-  }, [mapView, mapDispatch, id, location, stopResults, isStopsLayerCreated, selectedResult]);
+  }, [listView, mapDispatch, id, location, stopResults, isStopsLayerCreated, selectedResult]);
 
   useEffect(() => {
-    if (mapView && isStopsLayerCreated) {
+    if (!listView && isStopsLayerCreated) {
       updateMapStops(id, stopResults);
     }
-  }, [mapView, stopResults, updateMapStops, isStopsLayerCreated, id]);
+  }, [listView, stopResults, updateMapStops, isStopsLayerCreated, id]);
 
   // set query state on input change
   const onUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +152,7 @@ const BusStopAutoComplete = ({
           errorMessage={errorMessage}
         />
       </div>
-      {!mapView && location && (
+      {listView && location && (
         <>
           {stopsLoading ? (
             <div className="wmnds-p-md">
@@ -191,7 +191,7 @@ const BusStopAutoComplete = ({
           )}
         </>
       )}
-      {mapView && location && !selectedItem?.properties && (
+      {!listView && location && !selectedItem?.properties && (
         <>
           {stopResults?.length > 0 ? (
             <div className="wmnds-msg-help">
