@@ -8,25 +8,27 @@ const useRecommendedBusArea = () => {
   useEffect(() => {
     const smallestAreas: any = [];
     let recommendedBusArea = ['West Midlands'];
-    selectedStops.forEach((stop) => {
+    // Determine the smallest area that each selected stop falls in and push it to the array
+    selectedStops.forEach(({ stopBusAreas }) => {
       let recommendation: any = 'West Midlands';
       if (
-        stop.stopBusAreas.includes('Walsall') ||
-        stop.stopBusAreas.includes('Sandwell and Dudley') ||
-        stop.stopBusAreas.includes('Coventry')
+        stopBusAreas.includes('Walsall') ||
+        stopBusAreas.includes('Sandwell and Dudley') ||
+        stopBusAreas.includes('Coventry')
       ) {
-        recommendation = stop.stopBusAreas.filter(
+        recommendation = stopBusAreas.filter(
           (area: any) => area !== 'West Midlands' && area !== 'Black Country'
         );
         if (recommendation.length === 1) {
           recommendation = recommendation.join();
         }
-      } else if (stop.stopBusAreas.includes('Black Country')) {
+      } else if (stopBusAreas.includes('Black Country')) {
         recommendation = 'Black Country';
       }
       smallestAreas.push(recommendation);
     });
 
+    // Create an array of the selected areas with any duplications removed
     const uniqueAreas: string[] = [];
     smallestAreas.forEach((txt: string) => {
       if (!uniqueAreas.includes(txt)) {
@@ -46,6 +48,12 @@ const useRecommendedBusArea = () => {
       ) {
         recommendedBusArea = ['Black Country'];
       }
+    } else if (
+      uniqueAreas.length === 2 &&
+      uniqueAreas.includes('Walsall') &&
+      uniqueAreas.includes('Sandwell and Dudley')
+    ) {
+      recommendedBusArea = ['Black Country'];
     } else if (uniqueAreas.length === 1) {
       if (smallestAreas.includes('Walsall')) {
         recommendedBusArea = ['Walsall'];
